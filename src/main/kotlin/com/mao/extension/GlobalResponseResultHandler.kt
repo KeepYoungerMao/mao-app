@@ -118,7 +118,7 @@ class GlobalResponseResultHandler(
             @Suppress("UNCHECKED_CAST")
             return data as Response<Any?>
         }
-        return Response(code = 200, message = "Success", data = data)
+        return Response.success(data)
     }
 
     companion object {

@@ -83,20 +83,20 @@ class GlobalExceptionHandler {
     fun handleResponseStatusException(e: ResponseStatusException): Mono<Response<Nothing?>> {
         val httpValue = e.statusCode.value()
         log.warn("HTTP状态异常 [{}]: {}", httpValue, e.reason ?: e.message)
-        val friendlyMessage = when (httpValue) {
-            400 -> "请求参数错误，请检查输入格式"
-            401 -> "未授权或登录已过期，请重新登录"
-            403 -> "抱歉，您没有权限访问该资源"
-            404 -> "您请求的接口或资源不存在"
-            405 -> "请求方式不支持 (例如请检查是否将 GET 错写成 POST)"
-            406 -> "无法提供该格式的数据"
-            415 -> "不支持的数据类型，请检查 Content-Type"
-            429 -> "请求过于频繁，请稍后重试"
-            500 -> "服务器开小差了，请稍后再试"
-            502, 503, 504 -> "网络或服务暂时不可用，请稍后重试"
-            else -> e.reason ?: "系统繁忙，请稍后重试" // 兜底策略
+        val errorCode = when (httpValue) {
+            400 -> ErrorCode.BAD_REQUEST
+            401 -> ErrorCode.AUTHENTICATION_ERROR
+            403 -> ErrorCode.AUTHORIZATION_ERROR
+            404 -> ErrorCode.NOT_FOUND
+            405 -> ErrorCode.METHOD_NOT_ALLOWED
+            406 -> ErrorCode.NOT_ACCEPTABLE
+            415 -> ErrorCode.UNSUPPORTED_MEDIA_TYPE
+            429 -> ErrorCode.TOO_MANY_REQUESTS
+            500 -> ErrorCode.INTERNAL_SERVER_ERROR
+            502, 503, 504 -> ErrorCode.BAD_GATEWAY
+            else -> ErrorCode.INTERNAL_SERVER_ERROR
         }
-        return Mono.just(Response.error(httpValue, friendlyMessage))
+        return Mono.just(Response.error(errorCode))
     }
 
     /**

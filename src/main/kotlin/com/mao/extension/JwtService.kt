@@ -13,6 +13,7 @@ import com.nimbusds.jwt.SignedJWT
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import java.security.interfaces.RSAPrivateKey
 import java.time.Instant
 import java.util.*
 
@@ -23,6 +24,13 @@ class JwtService(
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
+
+    fun getPublicKey(): String {
+        val encode = rsaKey.toRSAPublicKey().encoded
+        return Base64.getEncoder().encodeToString(encode)
+    }
+
+    fun getPrivateKey(): RSAPrivateKey = rsaKey.toRSAPrivateKey()
 
     fun generateAccessToken(user: UserDetails): String {
         val now = Instant.now()
