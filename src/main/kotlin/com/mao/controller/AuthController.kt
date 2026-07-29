@@ -5,16 +5,13 @@ import com.mao.entity.auth.RefreshRequest
 import com.mao.entity.auth.RsaKey
 import com.mao.entity.auth.TokenResponse
 import com.mao.service.AuthService
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(private val authService: AuthService) {
 
-    @PostMapping("key")
+    @GetMapping("key")
     suspend fun key(): RsaKey = authService.key()
 
     @PostMapping("token")

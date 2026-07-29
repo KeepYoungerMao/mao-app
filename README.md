@@ -1,45 +1,97 @@
-# Mao-App
+<div style="text-align: center">
 
-自测项目
+# 🚀 MAO-APP
 
-## 使用架构
+**Reactive & High-Performance Backend Service Built with Kotlin and Spring WebFlux**
 
-`jdk-25`, `kotlin-2.4.0`, `gradle`, `spring-boot-4.1.0`, `web-flux`
+[English](README.md) | [简体中文](README.zh.md)
 
-库使用：
-- `kotlin-reflect`:`2.4.0`
-- `kotlin-stdlib`:`2.4.0`
-- `reactor-kotlin-extensions`:`1.3.1`
-- `kotlin-coroutines-reactor`:`1.10.2`
-- `spring-boot-starter-data-r2dbc`:`4.1.0`
-- `spring-boot-starter-webflux`:`4.1.0`
-- `mysql-connector-j`:`9.7.0`
-- `r2dbc-mysql`:`1.4.2`
-- `mappie-api`:`2.4.0-2.4.2`
-- `jackson-module-kotlin`:`3.1.4`
+</div>
 
-## 用户登录步骤
+---
+
+## 📌 Overview
+
+This project is a **fully reactive backend service framework/system** built with modern technology stacks. It aims to explore and practice modern reactive architecture, end-to-end full-link encrypted authentication, and high-performance database interactions.
+
+This project is fully open-source. Stars, Forks, Issues, and technical discussions are all welcome!
+
+### ✨ Key Features
+* **Modern Tech Stack**: Built on JDK 25 and Kotlin 2.4+ for an ultra-fast development and runtime experience.
+* **Fully Reactive Architecture**: Powered by Spring WebFlux + R2DBC, enabling low-latency, high-concurrency non-blocking I/O processing.
+* **End-to-End Security Authentication**:
+  * Frontend password salting & encryption via **RSA-OAEP (SHA-256)** to prevent plaintext transmission.
+  * Stateless dual-token renewal mechanism using **JWT (Bearer Token)** + **Refresh Token**.
+
+---
+
+## 🛠️ Tech Stack & Dependencies
+
+### Core Architecture
+
+[![jdk-25]][jdk-25-home]
+[![kotlin]][kotlin-home]
+[![gradle]][gradle-home]
+[![spring-boot]][spring-boot-home]
+[![webflux]][webflux-home]
+[![r2dbc]][r2dbc-home]
+[![license]][license-home]
+
+[jdk-25]: https://img.shields.io/badge/JDK-25-blue?logo=openjdk
+[jdk-25-home]: https://openjdk.org/projects/jdk/25/
+[kotlin]: https://img.shields.io/badge/Kotlin-2.4.0-7F52FF?logo=kotlin
+[kotlin-home]: https://kotlinlang.org
+[gradle]: https://img.shields.io/badge/Gradle-9.6.1-02303A?logo=gradle
+[gradle-home]: https://gradle.org
+[spring-boot]: https://img.shields.io/badge/SpringBoot-4.1.0-6DB33F?logo=springboot
+[spring-boot-home]: https://spring.io/projects/spring-boot
+[webflux]: https://img.shields.io/badge/WebFlux-Reactive-6DB33F?logo=spring
+[webflux-home]: https://docs.spring.io/spring-framework/reference/web/webflux.html
+[r2dbc]: https://img.shields.io/badge/R2DBC-Reactive-6DB33F?logo=spring
+[r2dbc-home]: https://r2dbc.io/
+[license]: https://img.shields.io/badge/License-MIT-yellow.svg
+[license-home]: https://opensource.org/licenses/MIT
+
+### Dependency List
+
+| Category              | Dependency / Library                | Version           |
+|:----------------------|:------------------------------------|:------------------|
+| **Language & Core**   | `kotlin-reflect` / `kotlin-stdlib`  | `2.4.0`           |
+| **Reactive & Async**  | `reactor-kotlin-extensions`         | `1.3.1`           |
+|                       | `kotlinx-coroutines-reactor`        | `1.10.2`          |
+| **Web & Persistence** | `spring-boot-starter-webflux`       | `4.1.0`           |
+|                       | `spring-boot-starter-data-r2dbc`    | `4.1.0`           |
+|                       | `r2dbc-mysql` / `mysql-connector-j` | `1.4.2` / `9.7.0` |
+| **Utils & Mapping**   | `mappie-api`                        | `2.4.0-2.4.2`     |
+|                       | `jackson-module-kotlin`             | `3.1.4`           |
+
+---
+
+## 🔐 Authentication & Security Design
+
+The system adopts a security workflow consisting of **RSA-OAEP dynamic public key encryption + Dual Token authentication**:
+
+### 1. Login Interaction Sequence Diagram
 
 ```text
-[cluster]                        [后端认证服务]
-     |                                    |
-     |----- 1. 请求公钥 (GET) ------------>|
-     |<---- 2. 返回 RSA 公钥 (PEM) --------|
-     |                                    |
-  [对密码加密: password + ":" + timestamp]
-     |                                    |
-     |----- 3. 提交登录 (POST) ---------->|
-     |<---- 4. 返回 TokenResponse --------|
-     |                                    |
-  [本地存储 accessToken & refreshToken]
-     |                                    |
-     |----- 5. 携带 Bearer Token 请求 ---->|
+[Client / Frontend]                             [Backend Auth Service]
+     |                                                    |
+     |----- 1. GET /api/v1/auth/key --------------------->|
+     |<---- 2. Return RSA Public Key (PEM format) --------|
+     |                                                    |
+[Client Encryption: password + ":" + timestamp]           |
+     |                                                    |
+     |----- 3. POST /api/v1/auth/token ------------------>|
+     |<---- 4. Validate & Return TokenResponse -----------|
+     |                                                    |
+[Store accessToken & refreshToken locally]                |
+     |                                                    |
+     |----- 5. Request API with Header: Authorization --->|
 ```
-
-### 请求公钥
-- **请求路径:** `POST` `/api/v1/auth/public-key`
-- **请求头:** `Content-Type: application/json`
-- **响应示例:**
+### 2. Authentication API Specification
+#### 🔑 Request RSA Public Key
+- Endpoint: `GET` `/api/v1/auth/public-key`
+- Response Example:
 ```json
 {
   "code": 200,
@@ -49,28 +101,26 @@
   }
 }
 ```
+#### 🔓 User Login / Obtain Token
+- Endpoint: `POST` `/api/v1/auth/token`
+- Headers: `Content-Type: application/json`
+- Request Body Parameters:
 
-### 请求token
-- **请求路径:** `POST` `/api/v1/auth/token`
-- **请求头:** `Content-Type: application/json`
-- **请求体示例:**
+| Field Name | Type   | Required | Description                                                                           |
+|:-----------|:-------|:---------|:--------------------------------------------------------------------------------------|
+| username   | String | Yes      | Username                                                                              |
+| password   | String | Yes      | Base64-encoded cipher text generated by encrypting `${password}:${timestamp}` via RSA |
+| timestamp  | Long   | Yes      | Request creation timestamp from client (in milliseconds)                              |
+
+- Request Body Example:
 ```json
 {
   "username": "admin",
-  "password": "k3f8S/X9A...== (RSA 加密后的 Base64 密文)",
+  "password": "k3f8S/X9A...== ",
   "timestamp": 1784882384851
 }
 ```
-- **请求参数说明：**
-
-| 字段名称      | 类型     | 必填 | 说明                                       |
-|:----------|:-------|:---|:-----------------------------------------|
-| username  | String | Y  | 用户名                                      |
-| password  | String | Y  | 使用`${password}:${timestamp}`进行拼接再加密后的字符串 |
-| timestamp | String | Y  | 请求时时间戳                                   |
-
-
-- **响应示例:**
+- Response Example:
 ```json
 {
   "code": 200,
@@ -83,16 +133,15 @@
   }
 }
 ```
-### 刷新token
-- **请求路径:** `POST` `/api/v1/auth/token/refresh`
-- **请求头:** `Content-Type: application/json`
-- **请求体示例:**
+#### 🔄 Refresh Access Token
+- Endpoint: `POST` `/api/v1/auth/token/refresh`
+- Request Body Example:
 ```json
 {
-  "refreshToken": "eyJhbGciOiJSUzI1NiIs..."
+  "refreshToken": "d8e7c1f0-..."
 }
 ```
-- **响应示例:**
+- Response Example:
 ```json
 {
   "code": 200,
@@ -105,26 +154,22 @@
   }
 }
 ```
-### 携带Token进行接口请求
-对于所有需要权限校验的业务接口（非 /api/v1/auth/** 路径），
-必须在请求头（Request Header）中携带 accessToken。
-- **请求头格式：**
+#### 🛡️ Request Specification for Protected Endpoints
+For all protected business APIs, the accessToken must be included in HTTP request headers:
 ```http request
 Authorization: Bearer <accessToken>
 ```
-### 前端密码加密实现规范
-为了保障密码生命周期安全，禁止直接传输明文密码。
-前端需使用浏览器原生的 Web Crypto API 进行 RSA-OAEP 加密。
-- 算法参数配置：
-  - 算法名称: `RSA-OAEP`
-  - 密钥长度: `2048` 位
-  - 主哈希算法 (Hash): `SHA-256`
-  - 掩码生成函数哈希 (MGF1 Hash): `SHA-256`
-  - 待加密明文拼装规则: `${password}:${timestamp}` （例：admin123:1784882384851）
-- 前端加密代码示例：
+### 3. Frontend Encryption Specification (Web Crypto API)
+To ensure transport security, plaintext passwords must never be transmitted directly. 
+The frontend should use the native Web Crypto API for RSA-OAEP encryption.
+- Encryption Parameters:
+  - Algorithm: `RSA-OAEP`
+  - Key Length: `2048` bits
+  - Hash Algorithm: `SHA-256`
+  - Payload Format: `${password}:${timestamp}` (Example: admin123:1784882384851)
 ```javascript
 /**
- * 将 PEM 或裸 Base64 格式的公钥转换为 ArrayBuffer
+ * Converts a PEM or raw Base64 formatted public key into an ArrayBuffer
  */
 function pemToArrayBuffer(pemPublicKey) {
   const b64 = pemPublicKey
@@ -141,31 +186,28 @@ function pemToArrayBuffer(pemPublicKey) {
 }
 
 /**
- * 使用 RSA-OAEP (SHA-256) 加密文本
+ * Encrypts plain password using RSA-OAEP (SHA-256)
  * 
- * @param {string} pemPublicKey 后端获取到的 RSA 公钥 (Base64 或 PEM 格式)
- * @param {string} plainPassword 用户输入的明文密码
- * @param {number} timestamp 当前时间戳 (Date.now())
- * @returns {Promise<string>} 返回 Base64 格式的密文
+ * @param {string} pemPublicKey RSA public key fetched from backend
+ * @param {string} plainPassword Plaintext password
+ * @param {number} timestamp Current timestamp (Date.now())
+ * @returns {Promise<string>} Base64-encoded encrypted cipher text
  */
 async function encryptPassword(pemPublicKey, plainPassword, timestamp) {
-  // 1. 拼装待加密明文: password:timestamp
   const payload = `${plainPassword}:${timestamp}`;
-
-  // 2. 导入公钥为 WebCrypto CryptoKey 对象
   const keyBuffer = pemToArrayBuffer(pemPublicKey);
+
   const cryptoKey = await window.crypto.subtle.importKey(
     "spki",
     keyBuffer,
     {
       name: "RSA-OAEP",
-      hash: "SHA-256" // 指定使用 SHA-256
+      hash: "SHA-256"
     },
     false,
     ["encrypt"]
   );
 
-  // 3. 执行加密
   const encodedPayload = new TextEncoder().encode(payload);
   const encryptedBuffer = await window.crypto.subtle.encrypt(
     { name: "RSA-OAEP" },
@@ -173,12 +215,44 @@ async function encryptPassword(pemPublicKey, plainPassword, timestamp) {
     encodedPayload
   );
 
-  // 4. 将加密后的 ArrayBuffer 转为 Base64 字符串
-  const encryptedBytes = new Uint8Array(encryptedBuffer);
-  let binary = '';
-  for (let i = 0; i < encryptedBytes.byteLength; i++) {
-    binary += String.fromCharCode(encryptedBytes[i]);
-  }
-  return window.btoa(binary);
+  return window.btoa(String.fromCharCode(...new Uint8Array(encryptedBuffer)));
 }
 ```
+## 🚀 Quick Start
+
+### Prerequisites
+- **JDK 25** or higher
+- **MySQL 8.x** / **PostgreSQL 18+** (with R2DBC reactive driver support)
+- **Gradle 9.x**
+### Local Setup & Run
+#### 1. Clone the Repository
+```shell
+git clone https://github.com/KeepYoungerMao/mao-app.git
+cd mao-app
+```
+#### 2. Configure Database
+Update database connection details in src/main/resources/application.yml:
+```yaml
+spring:
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/your_db
+    username: root
+    password: your_password
+```
+#### 3. Build & Run
+```shell
+./gradlew bootRun
+```
+## 💬 Technical Discussion & Contribution
+
+This is an open-source project aimed at sharing and technical exchange. 
+If you have any ideas, suggestions, or bug reports:
+
+- Feel free to open an Issue to start a discussion.
+- Pull Requests (PRs) are always welcome!
+
+If you find this project helpful, please give it a ⭐ Star!
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
