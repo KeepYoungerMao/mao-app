@@ -15,17 +15,33 @@ import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer
 import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer
 import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer
 import tools.jackson.databind.module.SimpleModule
+import java.security.spec.MGF1ParameterSpec
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import javax.crypto.spec.OAEPParameterSpec
+import javax.crypto.spec.PSource
 
-
+// 日期format格式
 const val DATE_FORMAT = "yyyy-MM-dd"
+// 日期时间format格式
 const val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+// 默认时区东八区
 val ZONE_SHANGHAI: ZoneId = ZoneId.of("Asia/Shanghai")
+// 日期格式化器
 val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(ZONE_SHANGHAI)
+// 日期时间格式化器
 val DATETIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT).withZone(ZONE_SHANGHAI)
+// RSA算法
+const val RSA_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
+// RSA加解密配置参数
+val RSA_OAEP_SPEC: OAEPParameterSpec = OAEPParameterSpec(
+    "SHA-256",
+    "MGF1",
+    MGF1ParameterSpec.SHA256,
+    PSource.PSpecified.DEFAULT
+)
 
 /**
  * 应用bean注册

@@ -4,6 +4,7 @@ import com.mao.entity.PageResponse
 import com.mao.entity.query.IdQo
 import com.mao.entity.query.UserAddQo
 import com.mao.entity.query.UserQo
+import com.mao.entity.query.UserUpdateQo
 import com.mao.entity.view.UserVo
 import com.mao.service.UserService
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,6 +26,6 @@ class UserController(private val userService: UserService) {
     suspend fun saveUser(@RequestBody request: UserAddQo): UserVo = userService.saveUser(request)
 
     @PostMapping("update")
-    suspend fun updateUser(@RequestBody request: UserAddQo): UserVo = userService.updateUser(request)
+    suspend fun updateUser(@RequestBody request: UserUpdateQo): UserVo = userService.updateUser(request)
 
 }

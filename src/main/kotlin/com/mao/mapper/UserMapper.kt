@@ -2,6 +2,7 @@ package com.mao.mapper
 
 import com.mao.entity.domain.UserDo
 import com.mao.entity.query.UserAddQo
+import com.mao.entity.query.UserUpdateQo
 import com.mao.entity.view.UserVo
 import com.mao.extension.asDateStr
 import org.springframework.stereotype.Component
@@ -10,31 +11,34 @@ import tech.mappie.api.ObjectMappie
 @Component
 class UserMapper {
 
-    fun toVo(userDO: UserDo): UserVo = UserVoMapper.map(userDO)
+    fun toVo(userDO: UserDo): UserVo = UserViewMapper.map(userDO)
 
-    fun toDo(userAdd: UserAddQo): UserDo = UserDoMapper.map(userAdd)
+    fun toDo(userAdd: UserAddQo): UserDo = UserCreateMapper.map(userAdd)
 
-    fun toNewDo(userAdd: UserAddQo): UserDo = UserDoMapper.map(userAdd).apply { id = null }
+    // 全量更新写法
+    // fun toDo(userUpdate: UserUpdateQo): UserDo = UserUpdateMapper.map(userUpdate)
 
-    fun copyToExistDo(userAdd: UserAddQo, userDo: UserDo): UserDo = userDo.apply {
-        userAdd.username?.let { username = it }
-        userAdd.avatar?.let { avatar = it }
-        userAdd.phone?.let { phone = it }
-        userAdd.email?.let { email = it }
-        userAdd.expired?.let { expired = it }
-        userAdd.locked?.let { locked = it }
-        userAdd.enabled?.let { enabled = it }
-        userAdd.expireTime?.let { expireTime = it }
-    }
+    // 增量更新写法
+     fun copyToExistDo(userUpdate: UserUpdateQo, userDo: UserDo): UserDo = userDo.apply {
+        userUpdate.username?.let { username = it }
+        userUpdate.avatar?.let { avatar = it }
+        userUpdate.phone?.let { phone = it }
+        userUpdate.email?.let { email = it }
+        userUpdate.expireTime?.let { expireTime = it }
+     }
 
 }
 
-object UserVoMapper: ObjectMappie<UserDo, UserVo>() {
+object UserViewMapper: ObjectMappie<UserDo, UserVo>() {
     override fun map(from: UserDo): UserVo = mapping {
         to::lastLoginTime fromExpression { from.lastLoginTime.asDateStr }
     }
 }
 
-object UserDoMapper: ObjectMappie<UserAddQo, UserDo>() {
+object UserCreateMapper: ObjectMappie<UserAddQo, UserDo>() {
     override fun map(from: UserAddQo): UserDo = mapping {}
+}
+
+object UserUpdateMapper: ObjectMappie<UserUpdateQo, UserDo>() {
+    override fun map(from: UserUpdateQo): UserDo = mapping {}
 }

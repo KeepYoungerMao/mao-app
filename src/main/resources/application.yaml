@@ -8,6 +8,15 @@ spring:
     url: r2dbc:mysql://localhost:3306/mao-mms
     username: root
     password: root
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: ${EMAIL_ADDRESS:100000001@qq.com}
+    password: ${EMAIL_AUTHORIZATION_CODE:abc123def456ghi789}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
 
 app:
   jwt:

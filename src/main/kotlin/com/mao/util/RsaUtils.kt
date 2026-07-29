@@ -1,17 +1,16 @@
 package com.mao.util
 
+import com.mao.config.RSA_OAEP_SPEC
+import com.mao.config.RSA_TRANSFORMATION
 import org.springframework.core.io.Resource
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
-import java.security.spec.MGF1ParameterSpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 import javax.crypto.Cipher
-import javax.crypto.spec.OAEPParameterSpec
-import javax.crypto.spec.PSource
 
 object RsaUtils {
 
@@ -39,15 +38,16 @@ object RsaUtils {
         return KeyFactory.getInstance("RSA").generatePrivate(spec) as RSAPrivateKey
     }
 
+    fun encrypt(content: String, publicKey: RSAPublicKey): String {
+        val cipher = Cipher.getInstance(RSA_TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, RSA_OAEP_SPEC)
+        val encryptedBytes = cipher.doFinal(content.toByteArray(Charsets.UTF_8))
+        return Base64.getEncoder().encodeToString(encryptedBytes)
+    }
+
     fun decrypt(content: String, privateKey: RSAPrivateKey): String {
-        val cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding")
-        val oaepSpec = OAEPParameterSpec(
-            "SHA-256",
-            "MGF1",
-            MGF1ParameterSpec.SHA256, // 必须指明 MGF1 使用 SHA256
-            PSource.PSpecified.DEFAULT
-        )
-        cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepSpec)
+        val cipher = Cipher.getInstance(RSA_TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, privateKey, RSA_OAEP_SPEC)
         val decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(content))
         return String(decryptedBytes, Charsets.UTF_8)
     }

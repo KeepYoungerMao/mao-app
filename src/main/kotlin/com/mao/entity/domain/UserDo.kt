@@ -32,13 +32,16 @@ data class UserDo(
     // 是否锁定 (默认为 false)
     var locked: Boolean? = null,
 
-    // 是否可使用 (默认为 true)
+    // 是否可使用 (默认为 false，表示第一次创建)
     var enabled: Boolean? = null,
 
     // 过期时间 (毫秒级时间戳，可空)
     var expireTime: Long? = null,
 
     // 上次登陆时间 (可空)
-    var lastLoginTime: Long? = null
+    var lastLoginTime: Long? = null,
+
+    // 是否需要修改密码（默认为false）
+    var mustChangePassword: Boolean? = null,
 
 ) : BaseDo()

@@ -9,13 +9,9 @@ package com.mao.entity.query
  * 5. createBy，createTime，updateBy，updateTime字段由审计功能赋值，不在新增/更新结构中
  */
 data class UserAddQo(
-    val id: Int? = null,
     val username: String? = null,
     val avatar: String? = null,
     val phone: String? = null,
     val email: String? = null,
-    val expired: Boolean? = null,
-    val locked: Boolean? = null,
-    val enabled: Boolean? = null,
     val expireTime: Long? = null,
 )
