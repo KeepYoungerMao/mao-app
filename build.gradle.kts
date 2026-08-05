@@ -18,6 +18,10 @@ java {
     }
 }
 
+springBoot {
+    mainClass.set("com.mao.AppKt")
+}
+
 repositories {
     mavenCentral()
 }
@@ -41,6 +45,8 @@ dependencies {
     // runtimeOnly("org.postgresql:r2dbc-postgresql")
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("io.asyncer:r2dbc-mysql")
+    // 上下文传递
+    implementation("io.micrometer:context-propagation")
     testImplementation("org.springframework.boot:spring-boot-starter-data-r2dbc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -32,7 +32,7 @@ object RandomUtils {
 
     fun sequence(num: Int): String {
         require(num > 13) { "num must be larger than 13" }
-        return "${System.currentTimeMillis()}${betterChars(num - 13)}"
+        return "${System.currentTimeMillis()}${numbers(num - 13)}"
     }
 
     private fun randomCode(num: Int, origin: Int, bound: Int): String {

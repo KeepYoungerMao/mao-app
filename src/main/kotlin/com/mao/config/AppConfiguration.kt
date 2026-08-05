@@ -1,6 +1,9 @@
 package com.mao.config
 
 import com.mao.extension.GlobalResponseResultHandler
+import io.micrometer.context.ContextRegistry
+import jakarta.annotation.PostConstruct
+import org.slf4j.MDC
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -9,6 +12,7 @@ import org.springframework.data.domain.ReactiveAuditorAware
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
 import org.springframework.http.codec.ServerCodecConfigurer
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver
+import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer
@@ -42,14 +46,29 @@ val RSA_OAEP_SPEC: OAEPParameterSpec = OAEPParameterSpec(
     MGF1ParameterSpec.SHA256,
     PSource.PSpecified.DEFAULT
 )
+// 全局日志名称
+const val TRACE_ID = "traceId"
 
 /**
  * 应用bean注册
- * 启用数据库审计功能
+ * 启用数据库审计功能：`@EnableR2dbcAuditing`
  */
 @Configuration
 @EnableR2dbcAuditing
 class AppConfiguration {
+
+    @PostConstruct
+    fun appInit() {
+        // 注册MDC中traceId的处理方式
+        ContextRegistry.getInstance().registerThreadLocalAccessor(
+            TRACE_ID,
+            { MDC.get(TRACE_ID) },
+            { value -> MDC.put(TRACE_ID, value) },
+            { MDC.remove(TRACE_ID) },
+        )
+        // 开启Reactor的自动上下文传播
+        Hooks.enableAutomaticContextPropagation()
+    }
 
     /**
      * 全局响应结果包装处理器
