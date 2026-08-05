@@ -27,9 +27,9 @@ CREATE TABLE `sys_dict_item`
     `name` VARCHAR(100) NOT NULL COMMENT '名称',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY(`pid`, `name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -44,9 +44,9 @@ CREATE TABLE `sys_province_city_district`
     `name` VARCHAR(100) NOT NULL COMMENT '名称',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -76,7 +76,7 @@ CREATE TABLE `sys_operation_log`
     `ip` VARCHAR(50) COMMENT '操作人IP',
     `success` TINYINT NOT NULL DEFAULT 1 COMMENT '是否成功',
     `error_message` TEXT COMMENT '错误信息',
-    `operation_time` BIGINT NOT NULL COMMENT '操作时间',
+    `operation_time` DATETIME(3) NOT NULL COMMENT '操作时间',
     `cost` BIGINT NOT NULL DEFAULT 0 COMMENT '接口耗时',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -95,12 +95,12 @@ CREATE TABLE `sys_user`
     `expired` TINYINT DEFAULT 0 COMMENT '是否过期',
     `locked` TINYINT DEFAULT 0 COMMENT '是否锁定',
     `expire_time` BIGINT COMMENT '过期时间',
-    `last_login_time` BIGINT COMMENT '上次登陆时间',
+    `last_login_time` DATETIME(3) COMMENT '上次登陆时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY (`username`),
     UNIQUE KEY (`phone`),
@@ -116,9 +116,9 @@ CREATE TABLE `sys_role`
     `description` VARCHAR(20) COMMENT '角色描述',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY (`name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -165,7 +165,7 @@ CREATE TABLE `sys_user_profile`
     `user_code` VARCHAR(10) NOT NULL COMMENT '用户编号',
     `real_name` VARCHAR(20) NOT NULL COMMENT '姓名',
     `sex_id` INT COMMENT '性别ID',
-    `entry_time` BIGINT COMMENT '入职时间',
+    `entry_date` DATE COMMENT '入职日期',
     `id_card_num` VARCHAR(18) NOT NULL COMMENT '身份证号',
     `blood_type_id` INT COMMENT '血型ID',
     `high` DECIMAL(5,2) COMMENT '身高，单位CM',
@@ -174,7 +174,7 @@ CREATE TABLE `sys_user_profile`
     `city_id` INT COMMENT '市ID',
     `district_id` INT COMMENT '区ID',
     `address` VARCHAR(200) COMMENT '详细地址',
-    `birthday` BIGINT COMMENT '出生日期',
+    `birthday` DATE COMMENT '出生日期',
     `nation_id` INT COMMENT '民族ID',
     `country_id` INT COMMENT '国籍ID',
     `marital_id` INT COMMENT '婚姻状况ID',
@@ -190,9 +190,9 @@ CREATE TABLE `sys_user_profile`
     `remark` VARCHAR(200) COMMENT '备注',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
     KEY user_code(`user_code`),
@@ -207,15 +207,15 @@ CREATE TABLE `sys_user_profile_education`
     `institution_name` VARCHAR(50) NOT NULL COMMENT '学校/教育机构名称',
     `degree` VARCHAR(30) COMMENT '获得的学位',
     `major` VARCHAR(50) COMMENT '专业名称',
-    `start_date` BIGINT COMMENT '入学日期',
-    `end_date` BIGINT COMMENT '毕业日期',
+    `start_date` DATE COMMENT '入学日期',
+    `end_date` DATE COMMENT '毕业日期',
     `additional_info` TEXT COMMENT '其他教育相关经历',
     `order` INT NOT NULL DEFAULT 0 COMMENT '排序',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
     UNIQUE KEY(`user_id`, `institution_name`)
@@ -229,16 +229,16 @@ CREATE TABLE `sys_user_profile_work`
     `company_name` VARCHAR(50) NOT NULL COMMENT '公司/单位名称',
     `job_title` VARCHAR(30) COMMENT '职位名称',
     `industry` VARCHAR(50) COMMENT '所在行业',
-    `start_date` BIGINT COMMENT '入职日期',
-    `end_date` BIGINT COMMENT '离职日期',
+    `start_date` DATE COMMENT '入职日期',
+    `end_date` DATE COMMENT '离职日期',
     `responsibilities` TEXT COMMENT '工作职责和主要成就',
     `current_employment` TINYINT DEFAULT 0 COMMENT '是否在职',
     `order` INT NOT NULL DEFAULT 0 COMMENT '排序',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
     UNIQUE KEY(`user_id`, `company_name`)
@@ -257,9 +257,9 @@ CREATE TABLE `sys_user_profile_relationship`
     `order` INT NOT NULL DEFAULT 0 COMMENT '排序',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -271,13 +271,13 @@ CREATE TABLE `sys_user_profile_material`
     `user_id` INT NOT NULL COMMENT '用户id',
     `material_name` VARCHAR(50) NOT NULL COMMENT '材料名称',
     `file_path` VARCHAR(1000) NOT NULL COMMENT '文件存储路径，包含文件名',
-    `upload_time` BIGINT NOT NULL COMMENT '文件上传时间',
+    `upload_time` DATETIME(3) NOT NULL COMMENT '文件上传时间',
     `description` TEXT COMMENT '补充说明',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
     UNIQUE KEY(`user_id`, `material_name`)
@@ -296,7 +296,7 @@ CREATE TABLE `sys_company`
     `unified_social_credit_code` VARCHAR(18) COMMENT '统一社会信用代码/注册号',
     `company_type_id` INT COMMENT '公司类型id',
     `legal_representative` VARCHAR(100) COMMENT '法定代表人',
-    `founded_date` BIGINT COMMENT '成立日期',
+    `founded_date` DATE COMMENT '成立日期',
     `registered_capital` VARCHAR(50) COMMENT '注册资本',
     `business_scope` VARCHAR(500) COMMENT '经营范围',
     `registered_address` VARCHAR(300) COMMENT '注册地址',
@@ -313,9 +313,9 @@ CREATE TABLE `sys_company`
     `company_logo_filepath` VARCHAR(300) COMMENT '公司logo文件地址',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -330,9 +330,9 @@ CREATE TABLE `sys_department`
     `description` VARCHAR(300) COMMENT '描述',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY (`company_id`, `department_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -369,9 +369,9 @@ CREATE TABLE `data_picture` (
     `height` INT NOT NULL COMMENT '长度',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     FULLTEXT INDEX `picture_text_index`(`name`, `keyword`) WITH PARSER `ngram`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -383,9 +383,9 @@ CREATE TABLE `data_picture_type` (
     `pid` INT NOT NULL DEFAULT 0 COMMENT '父类id',
     `name` VARCHAR(50) NOT NULL COMMENT '名称',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY(`name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -412,9 +412,9 @@ CREATE TABLE `data_ancient_book` (
     `keyword` VARCHAR(1000) COMMENT '关键词',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -428,9 +428,9 @@ CREATE TABLE `data_ancient_book_chapter` (
     `content` MEDIUMTEXT COMMENT '章节内容',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY (`book_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
@@ -605,9 +605,9 @@ CREATE TABLE `data_chinese_surname`
     `distribution` TEXT COMMENT '分布',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -624,9 +624,9 @@ CREATE TABLE `data_poem`
     `remark` VARCHAR(100) COMMENT '备注',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -641,9 +641,9 @@ CREATE TABLE `data_poet`
     `intro` TEXT COMMENT '介绍',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -659,9 +659,9 @@ CREATE TABLE `data_live`
     `live_url` VARCHAR(300) COMMENT '网络节目地址',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -689,8 +689,8 @@ CREATE TABLE `data_crude_drug`
     `compatibility_prescription` VARCHAR(1000) COMMENT '药方配伍',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` BIGINT COMMENT '创建时间',
+    `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` BIGINT COMMENT '更新时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;

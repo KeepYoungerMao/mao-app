@@ -1,7 +1,6 @@
 package com.mao.entity.view
 
-import com.mao.extension.TimestampToStrSerializer
-import tools.jackson.databind.annotation.JsonSerialize
+import java.time.LocalDateTime
 
 /**
  * 查询结果数据公共字段类
@@ -9,13 +8,8 @@ import tools.jackson.databind.annotation.JsonSerialize
 open class BaseVo {
 
     var creator: String? = null
-
-    @JsonSerialize(using = TimestampToStrSerializer::class)
-    var createTime: Long? = null
-
+    var createTime: LocalDateTime? = null
     var updater: String? = null
-
-    @JsonSerialize(using = TimestampToStrSerializer::class)
-    var updateTime: Long? = null
+    var updateTime: LocalDateTime? = null
 
 }

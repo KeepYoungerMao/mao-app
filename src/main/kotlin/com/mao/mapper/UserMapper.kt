@@ -4,7 +4,6 @@ import com.mao.entity.domain.UserDo
 import com.mao.entity.query.UserAddQo
 import com.mao.entity.query.UserUpdateQo
 import com.mao.entity.view.UserVo
-import com.mao.extension.asDateStr
 import org.springframework.stereotype.Component
 import tech.mappie.api.ObjectMappie
 
@@ -14,9 +13,6 @@ class UserMapper {
     fun toVo(userDO: UserDo): UserVo = UserViewMapper.map(userDO)
 
     fun toDo(userAdd: UserAddQo): UserDo = UserCreateMapper.map(userAdd)
-
-    // 全量更新写法
-    // fun toDo(userUpdate: UserUpdateQo): UserDo = UserUpdateMapper.map(userUpdate)
 
     // 增量更新写法
      fun copyToExistDo(userUpdate: UserUpdateQo, userDo: UserDo): UserDo = userDo.apply {
@@ -30,15 +26,9 @@ class UserMapper {
 }
 
 object UserViewMapper: ObjectMappie<UserDo, UserVo>() {
-    override fun map(from: UserDo): UserVo = mapping {
-        to::lastLoginTime fromExpression { from.lastLoginTime.asDateStr }
-    }
+    override fun map(from: UserDo): UserVo = mapping {}
 }
 
 object UserCreateMapper: ObjectMappie<UserAddQo, UserDo>() {
     override fun map(from: UserAddQo): UserDo = mapping {}
-}
-
-object UserUpdateMapper: ObjectMappie<UserUpdateQo, UserDo>() {
-    override fun map(from: UserUpdateQo): UserDo = mapping {}
 }

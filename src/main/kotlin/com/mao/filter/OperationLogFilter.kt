@@ -16,6 +16,8 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
+import java.time.Duration
+import java.time.LocalDateTime
 
 @Component
 class OperationLogFilter(
@@ -24,7 +26,7 @@ class OperationLogFilter(
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         return mono {
-            val startTime = System.currentTimeMillis()
+            val startTime = LocalDateTime.now()
             var errorMsg: String? = null
 
             try {
@@ -45,7 +47,7 @@ class OperationLogFilter(
      */
     override fun getOrder(): Int = Ordered.LOWEST_PRECEDENCE
 
-    private suspend fun processOperationLog(exchange: ServerWebExchange, startTime: Long, errorMsg: String?) {
+    private suspend fun processOperationLog(exchange: ServerWebExchange, startTime: LocalDateTime, errorMsg: String?) {
         // 1. 获取当前请求实际匹配的 Controller HandlerMethod (WebFlux核心特性)
         val handler = exchange.getAttribute<Any>(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE)
         if (handler !is HandlerMethod) return
@@ -66,7 +68,7 @@ class OperationLogFilter(
         val operation = if (methodAnn.operation != Operation.ERROR) methodAnn.operation else return
         val description = ""
         val username = currentUser() ?: "anonymous"
-        val cost = System.currentTimeMillis() - startTime
+        val cost = Duration.between(startTime, LocalDateTime.now()).toMillis()
         val ip = extractIp(exchange)
         val method = exchange.request.method.name()
         val operationLog = OperationLogDo(

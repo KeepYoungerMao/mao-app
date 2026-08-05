@@ -1,5 +1,7 @@
 package com.mao.entity.view
 
+import java.time.LocalDateTime
+
 data class UserVo(
     val id: Int? = null,
     val username: String? = null,
@@ -10,5 +12,5 @@ data class UserVo(
     val locked: Boolean? = null,
     val enabled: Boolean? = null,
     val expireTime: Long? = null,
-    val lastLoginTime: String? = null
+    val lastLoginTime: LocalDateTime? = null
 ) : BaseVo()

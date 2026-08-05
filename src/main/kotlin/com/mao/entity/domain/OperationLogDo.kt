@@ -1,6 +1,7 @@
 package com.mao.entity.domain
 
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
 @Table("sys_operation_log")
 data class OperationLogDo(
@@ -14,6 +15,6 @@ data class OperationLogDo(
     var ip: String? = null,
     var success: Boolean? = null,
     var errorMessage: String? = null,
-    var operationTime: Long? = null,
+    var operationTime: LocalDateTime? = null,
     var cost: Long? = null
 )

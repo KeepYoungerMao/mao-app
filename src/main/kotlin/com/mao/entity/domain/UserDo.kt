@@ -2,6 +2,7 @@ package com.mao.entity.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
 @Table("sys_user")
 data class UserDo(
@@ -39,7 +40,7 @@ data class UserDo(
     var expireTime: Long? = null,
 
     // 上次登陆时间 (可空)
-    var lastLoginTime: Long? = null,
+    var lastLoginTime: LocalDateTime? = null,
 
     // 是否需要修改密码（默认为false）
     var mustChangePassword: Boolean? = null,

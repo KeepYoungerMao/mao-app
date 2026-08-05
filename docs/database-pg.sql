@@ -38,9 +38,9 @@ CREATE TABLE sys_dict_item (
    pid INTEGER NOT NULL,
    name VARCHAR(100) NOT NULL,
    creator VARCHAR(20),
-   create_time BIGINT,
+   create_time TIMESTAMP(3),
    updater VARCHAR(20),
-   update_time BIGINT
+   update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_dict_item IS '字典项表';
 COMMENT ON COLUMN sys_dict_item.id IS '主键';
@@ -60,9 +60,9 @@ CREATE TABLE sys_province_city_district (
     code VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_province_city_district IS '省市区字典表';
 COMMENT ON COLUMN sys_province_city_district.id IS '主键';
@@ -104,7 +104,7 @@ CREATE TABLE sys_operate_log (
     ip VARCHAR(50),
     success BOOLEAN DEFAULT TRUE,
     error_message TEXT,
-    operation_time BIGINT NOT NULL,
+    operation_time TIMESTAMP(3) NOT NULL,
     cost BIGINT NOT NULL DEFAULT 0
 );
 COMMENT ON TABLE sys_operate_log IS '操作日志表';
@@ -134,11 +134,11 @@ CREATE TABLE sys_user (
     expired BOOLEAN DEFAULT FALSE,
     locked BOOLEAN DEFAULT FALSE,
     expire_time BIGINT,
-    last_login_time BIGINT,
+    last_login_time TIMESTAMP(3),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_user IS '用户表';
 COMMENT ON COLUMN sys_user.id IS '主键';
@@ -169,9 +169,9 @@ CREATE TABLE sys_role (
     name VARCHAR(20),
     description VARCHAR(20),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_role IS '角色表';
 COMMENT ON COLUMN sys_role.id IS '主键';
@@ -231,7 +231,7 @@ CREATE TABLE sys_user_profile (
     user_code VARCHAR(10) NOT NULL,
     real_name VARCHAR(20) NOT NULL,
     sex_id INTEGER,
-    entry_time BIGINT,
+    entry_time DATE,
     id_card_num VARCHAR(18) NOT NULL,
     blood_type_id INTEGER,
     high DECIMAL(5,2),
@@ -240,7 +240,7 @@ CREATE TABLE sys_user_profile (
     city_id INTEGER,
     district_id INTEGER,
     address VARCHAR(200),
-    birthday BIGINT,
+    birthday DATE,
     nation_id INTEGER,
     country_id INTEGER,
     marital_id INTEGER,
@@ -255,9 +255,9 @@ CREATE TABLE sys_user_profile (
     hobby VARCHAR(100),
     remark VARCHAR(200),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_user_profile IS '用户资料信息表';
 COMMENT ON COLUMN sys_user_profile.id IS '主键';
@@ -304,14 +304,14 @@ CREATE TABLE sys_user_profile_education (
     institution_name VARCHAR(50) NOT NULL,
     degree VARCHAR(30),
     major VARCHAR(50),
-    start_date BIGINT,
-    end_date BIGINT,
+    start_date DATE,
+    end_date DATE,
     additional_info TEXT,
     "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT,
+    update_time TIMESTAMP(3),
     CONSTRAINT uk_user_education_unique UNIQUE (user_id, institution_name)
 );
 COMMENT ON TABLE sys_user_profile_education IS '教育经历表';
@@ -338,15 +338,15 @@ CREATE TABLE sys_user_profile_work (
     company_name VARCHAR(50) NOT NULL,
     job_title VARCHAR(30),
     industry VARCHAR(50),
-    start_date BIGINT,
-    end_date BIGINT,
+    start_date DATE,
+    end_date DATE,
     responsibilities TEXT,
     current_employment BOOLEAN DEFAULT FALSE,
     "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT,
+    update_time TIMESTAMP(3),
     CONSTRAINT uk_user_work_unique UNIQUE (user_id, company_name)
 );
 COMMENT ON TABLE sys_user_profile_work IS '工作经历表';
@@ -378,9 +378,9 @@ CREATE TABLE sys_user_profile_relationship (
     remark VARCHAR(300),
     "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_user_profile_relationship IS '人员关系表';
 COMMENT ON COLUMN sys_user_profile_relationship.id IS '主键';
@@ -404,12 +404,12 @@ CREATE TABLE sys_user_profile_material (
     user_id INTEGER NOT NULL,
     material_name VARCHAR(50) NOT NULL,
     file_path VARCHAR(1000) NOT NULL,
-    upload_time BIGINT NOT NULL,
+    upload_time TIMESTAMP(3) NOT NULL,
     description TEXT,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_user_profile_material IS '补充材料表';
 COMMENT ON COLUMN sys_user_profile_material.id IS '主键';
@@ -437,7 +437,7 @@ CREATE TABLE sys_company (
     unified_social_credit_code VARCHAR(18),
     company_type_id INTEGER,
     legal_representative VARCHAR(100),
-    founded_date BIGINT,
+    founded_date DATE,
     registered_capital VARCHAR(50),
     business_scope VARCHAR(500),
     registered_address VARCHAR(300),
@@ -453,9 +453,9 @@ CREATE TABLE sys_company (
     description TEXT,
     company_logo_filepath VARCHAR(300),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT,
+    update_time TIMESTAMP(3),
     CONSTRAINT uk_company_name UNIQUE (company_name),
     CONSTRAINT uk_company_unified_social_credit_code UNIQUE (unified_social_credit_code)
 );
@@ -495,9 +495,9 @@ CREATE TABLE sys_department (
     department_name VARCHAR(100) NOT NULL,
     description VARCHAR(300),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT,
+    update_time TIMESTAMP(3),
     CONSTRAINT uk_department_company_name UNIQUE (company_id, department_name)
 );
 COMMENT ON TABLE sys_department IS '部门表';
@@ -547,9 +547,9 @@ CREATE TABLE data_picture (
     width INTEGER NOT NULL,
     height INTEGER NOT NULL,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_picture IS '图片表';
 COMMENT ON COLUMN data_picture.id IS '主键';
@@ -579,9 +579,9 @@ CREATE TABLE data_picture_type (
     pid INTEGER NOT NULL DEFAULT 0,
     name VARCHAR(50) NOT NULL,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT,
+    update_time TIMESTAMP(3),
     CONSTRAINT uk_picture_type_name UNIQUE (name)
 );
 COMMENT ON TABLE data_picture_type IS '图片分类表';
@@ -615,9 +615,9 @@ CREATE TABLE data_ancient_book (
     dynasty_id INTEGER NOT NULL DEFAULT 0,
     keyword VARCHAR(1000),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_ancient_book IS '古书籍表';
 COMMENT ON COLUMN data_ancient_book.id IS '主键';
@@ -652,9 +652,9 @@ CREATE TABLE data_ancient_book_chapter (
     "order" INTEGER NOT NULL DEFAULT 0,
     content TEXT,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_ancient_book_chapter IS '古书籍章节表';
 COMMENT ON COLUMN data_ancient_book_chapter.id IS '主键';
@@ -940,9 +940,9 @@ CREATE TABLE data_chinese_surname (
     origin TEXT,
     distribution TEXT,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_chinese_surname IS '中国姓氏表';
 COMMENT ON COLUMN data_chinese_surname.id IS '主键id';
@@ -971,9 +971,9 @@ CREATE TABLE data_poem (
     content TEXT,
     remark VARCHAR(100),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_poem IS '诗词表';
 COMMENT ON COLUMN data_poem.id IS '主键id';
@@ -999,9 +999,9 @@ CREATE TABLE data_poet (
     avatar VARCHAR(200),
     intro TEXT,
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_poet IS '诗人表';
 COMMENT ON COLUMN data_poet.id IS '主键id';
@@ -1025,9 +1025,9 @@ CREATE TABLE data_live (
     image_url VARCHAR(200),
     live_url VARCHAR(300),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_live IS '网络节目表';
 COMMENT ON COLUMN data_live.id IS '主键id';
@@ -1063,9 +1063,9 @@ CREATE TABLE data_crude_drug (
     use_taboo VARCHAR(1000),
     compatibility_prescription VARCHAR(1000),
     creator VARCHAR(20),
-    create_time BIGINT,
+    create_time TIMESTAMP(3),
     updater VARCHAR(20),
-    update_time BIGINT
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE data_crude_drug IS '中草药表';
 COMMENT ON COLUMN data_crude_drug.id IS '主键id';

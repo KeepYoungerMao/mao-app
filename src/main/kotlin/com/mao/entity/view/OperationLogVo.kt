@@ -1,5 +1,7 @@
 package com.mao.entity.view
 
+import java.time.LocalDateTime
+
 data class OperationLogVo(
     val id: Long? = null,
     val username: String? = null,
@@ -11,6 +13,6 @@ data class OperationLogVo(
     val ip: String? = null,
     val success: Boolean? = null,
     val errorMessage: String? = null,
-    val operationTime: Long? = null,
+    val operationTime: LocalDateTime? = null,
     val cost: Long? = null
 )
