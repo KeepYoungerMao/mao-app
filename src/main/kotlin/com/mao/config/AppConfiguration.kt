@@ -11,6 +11,7 @@ import org.springframework.core.ReactiveAdapterRegistry
 import org.springframework.data.domain.ReactiveAuditorAware
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
 import org.springframework.http.codec.ServerCodecConfigurer
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
@@ -107,7 +108,11 @@ class AppConfiguration {
     @Bean
     fun auditorProvider(): ReactiveAuditorAware<String> {
         return ReactiveAuditorAware {
-            Mono.just("admin")
+            ReactiveSecurityContextHolder.getContext()
+                .mapNotNull { it.authentication }
+                .filter { it.isAuthenticated }
+                .map { authentication -> authentication.name }
+                .switchIfEmpty(Mono.just("admin"))
         }
     }
 

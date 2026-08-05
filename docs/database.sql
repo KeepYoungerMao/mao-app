@@ -63,13 +63,21 @@ CREATE TABLE `sys_industry_2017`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 系统操作日志
-DROP TABLE IF EXISTS `sys_operate_log`;
-CREATE TABLE `sys_operate_log`
+DROP TABLE IF EXISTS `sys_operation_log`;
+CREATE TABLE `sys_operation_log`
 (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `operate` VARCHAR(50) NOT NULL COMMENT '操作',
-    `operator` VARCHAR(20) NOT NULL COMMENT '操作人',
-    `operator_time` BIGINT NOT NULL COMMENT '操作时间',
+    `username` VARCHAR(20) NOT NULL COMMENT '操作人',
+    `scope` VARCHAR(20) NOT NULL COMMENT '操作域',
+    `module` VARCHAR(50) NOT NULL COMMENT '操作模块',
+    `operation` VARCHAR(50) NOT NULL COMMENT '操作项',
+    `description` VARCHAR(200) COMMENT '操作描述',
+    `method` VARCHAR(20) COMMENT 'HTTP METHOD',
+    `ip` VARCHAR(50) COMMENT '操作人IP',
+    `success` TINYINT NOT NULL DEFAULT 1 COMMENT '是否成功',
+    `error_message` TEXT COMMENT '错误信息',
+    `operation_time` BIGINT NOT NULL COMMENT '操作时间',
+    `cost` BIGINT NOT NULL DEFAULT 0 COMMENT '接口耗时',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 

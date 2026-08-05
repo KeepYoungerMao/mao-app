@@ -95,15 +95,31 @@ COMMENT ON COLUMN sys_industry_2017.description IS '描述';
 DROP TABLE IF EXISTS sys_operate_log;
 CREATE TABLE sys_operate_log (
     id BIGSERIAL PRIMARY KEY,
-    operate VARCHAR(50) NOT NULL,
-    operator VARCHAR(20) NOT NULL,
-    operator_time BIGINT NOT NULL
+    username VARCHAR(20) NOT NULL,
+    scope VARCHAR(20) NOT NULL,
+    module VARCHAR(50) NOT NULL,
+    operation VARCHAR(50) NOT NULL,
+    description VARCHAR(200),
+    method VARCHAR(20),
+    ip VARCHAR(50),
+    success BOOLEAN DEFAULT TRUE,
+    error_message TEXT,
+    operation_time BIGINT NOT NULL,
+    cost BIGINT NOT NULL DEFAULT 0
 );
 COMMENT ON TABLE sys_operate_log IS '操作日志表';
 COMMENT ON COLUMN sys_operate_log.id IS '主键';
-COMMENT ON COLUMN sys_operate_log.operate IS '操作';
-COMMENT ON COLUMN sys_operate_log.operator IS '操作人';
-COMMENT ON COLUMN sys_operate_log.operator_time IS '操作时间';
+COMMENT ON COLUMN sys_operate_log.username IS '操作人';
+COMMENT ON COLUMN sys_operate_log.scope IS '操作域';
+COMMENT ON COLUMN sys_operate_log.module IS '操作模块';
+COMMENT ON COLUMN sys_operate_log.operation IS '操作项';
+COMMENT ON COLUMN sys_operate_log.description IS '操作描述';
+COMMENT ON COLUMN sys_operate_log.method IS 'HTTP METHOD';
+COMMENT ON COLUMN sys_operate_log.ip IS '操作人IP';
+COMMENT ON COLUMN sys_operate_log.success IS '是否成功';
+COMMENT ON COLUMN sys_operate_log.error_message IS '错误信息';
+COMMENT ON COLUMN sys_operate_log.operation_time IS '操作时间';
+COMMENT ON COLUMN sys_operate_log.cost IS '接口耗时';
 
 -- 用户表
 DROP TABLE IF EXISTS sys_user;
