@@ -35,6 +35,7 @@ class ReactiveUserDetailsServiceImpl(
             .accountLocked(user.locked == true)
             .credentialsExpired(false)
             .roles(*roles.toTypedArray())
+
             .build()
     }
 

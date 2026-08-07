@@ -16,7 +16,7 @@ object RandomUtils {
      * 44-66 : 不包含 i, l, o, u 的小写字母（共 22 个）
      * 66-74 : 剩余字母（共 8 个）
      */
-    private val RANDOM_CODE: ByteArray =
+    val RANDOM_CODE: ByteArray =
         ".@#$%^&*_?!~0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyziIlLoOuU"
             .toByteArray(StandardCharsets.UTF_8)
 

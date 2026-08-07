@@ -1,9 +1,9 @@
 package com.mao.mapper
 
-import com.mao.entity.domain.UserDo
-import com.mao.entity.query.UserAddQo
-import com.mao.entity.query.UserUpdateQo
-import com.mao.entity.view.UserVo
+import com.mao.entity.UserAddQo
+import com.mao.entity.UserDo
+import com.mao.entity.UserUpdateQo
+import com.mao.entity.UserVo
 import org.springframework.stereotype.Component
 import tech.mappie.api.ObjectMappie
 

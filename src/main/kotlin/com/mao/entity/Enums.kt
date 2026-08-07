@@ -1,9 +1,15 @@
 package com.mao.entity
 
+/**
+ * 全局错误码
+ */
 enum class ErrorCode(val code: Int, val message: String) {
 
     SUCCESS(200, "成功"),
     BAD_REQUEST(400, "请求参数错误"),
+    ILLEGAL_PASSWORD(4001, "密码不合法"),
+    ILLEGAL_EXPIRE_TIME(4002, "过期时间不合法"),
+    DATA_NOT_FOUND(4003, "数据不存在"),
 
     // 认证异常
     AUTHENTICATION_ERROR(4101, "认证错误，请联系管理员"),
@@ -13,6 +19,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     USER_EXPIRED(4105, "账户已到期"),
     USER_LOCKED(4106, "账户已锁定"),
     USER_UNENABLED(4107, "账户已停用"),
+    UNCHANGE_PASSWORD(4108, "请前往修改密码再进行登录"),
     MISS_TOKEN(4108, "认证信息缺失"),
     BAD_TOKEN(4109, "认证信息格式不正确"),
     INVALID_TOKEN(4110, "认证信息无效"),
@@ -33,7 +40,60 @@ enum class ErrorCode(val code: Int, val message: String) {
     INTERNAL_SERVER_ERROR(500, "服务器开小差了，请稍后再试"),
     BAD_GATEWAY(502, "网络或服务暂时不可用，请稍后重试"),
 
-    DATA_NOT_FOUND(5001, "数据不存在")
     ;
+
+}
+
+/**
+ * 系统操作日志域
+ */
+enum class OperationScope {
+    SYSTEM,     // 系统
+    DATA,       // 数据
+}
+
+/**
+ * 系统操作日志模块
+ */
+enum class OperationModule(val scope: OperationScope) {
+
+    USER(OperationScope.SYSTEM),
+    ROLE(OperationScope.SYSTEM),
+    PERMISSION(OperationScope.SYSTEM),
+    OPERATION_LOG(OperationScope.SYSTEM),
+    DICT(OperationScope.SYSTEM),
+    DEPARTMENT(OperationScope.SYSTEM),
+    COMPANY(OperationScope.SYSTEM),
+
+    ANCIENT_BOOK(OperationScope.DATA),
+    CHINESE_SURNAME(OperationScope.DATA),
+    CRUDE_DRUG(OperationScope.DATA),
+    LIVE(OperationScope.DATA),
+    LOL(OperationScope.DATA),
+    PICTURE(OperationScope.DATA),
+    POEM(OperationScope.DATA),
+    POET(OperationScope.DATA),
+
+    ERROR(OperationScope.SYSTEM),
+
+}
+
+/**
+ * 系统操作日志-操作类型
+ */
+enum class Operation {
+
+    PAGE,
+    DETAIL,
+    CREATE,
+    UPDATE,
+    DELETE,
+
+    PASSWORD_UPDATE,    // 特殊 密码更新
+    PASSWORD_RESET,     // 特殊 密码重置
+    USER_RENEWAL,       // 特殊 用户续期
+    USER_LOCKED,        // 特殊 用户解锁/锁定
+
+    ERROR,
 
 }

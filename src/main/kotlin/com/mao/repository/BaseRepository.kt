@@ -1,7 +1,7 @@
 package com.mao.repository
 
 import com.mao.entity.ErrorCode
-import com.mao.entity.query.PageQo
+import com.mao.entity.PageQo
 import com.mao.ex.AppException
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository

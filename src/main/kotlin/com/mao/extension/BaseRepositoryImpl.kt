@@ -1,7 +1,7 @@
 package com.mao.extension
 
 import com.mao.entity.PageResponse
-import com.mao.entity.query.PageQo
+import com.mao.entity.PageQo
 import com.mao.repository.PageableRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

@@ -16,6 +16,10 @@ object RsaUtils {
 
     fun parsePublicKey(resource: Resource): RSAPublicKey {
         val content = resource.inputStream.bufferedReader().use { it.readText() }
+        return parsePublicKey(content)
+    }
+
+    fun parsePublicKey(content: String): RSAPublicKey {
         val cleanKey = content
             .replace("-----BEGIN PUBLIC KEY-----", "")
             .replace("-----END PUBLIC KEY-----", "")
@@ -28,6 +32,10 @@ object RsaUtils {
 
     fun parsePrivateKey(resource: Resource): RSAPrivateKey {
         val content = resource.inputStream.bufferedReader().use { it.readText() }
+        return parsePrivateKey(content)
+    }
+
+    fun parsePrivateKey(content: String): RSAPrivateKey {
         val cleanKey = content
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")

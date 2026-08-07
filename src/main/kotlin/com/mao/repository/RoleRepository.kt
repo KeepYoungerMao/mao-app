@@ -1,7 +1,7 @@
 package com.mao.repository
 
-import com.mao.entity.domain.RoleDo
-import com.mao.entity.query.RoleQo
+import com.mao.entity.RoleDo
+import com.mao.entity.RoleQo
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.r2dbc.repository.Query
 

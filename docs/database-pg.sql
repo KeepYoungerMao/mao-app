@@ -133,7 +133,7 @@ CREATE TABLE sys_user (
     enabled BOOLEAN DEFAULT TRUE,
     expired BOOLEAN DEFAULT FALSE,
     locked BOOLEAN DEFAULT FALSE,
-    expire_time BIGINT,
+    expire_time TIMESTAMP(3),
     last_login_time TIMESTAMP(3),
     creator VARCHAR(20),
     create_time TIMESTAMP(3),

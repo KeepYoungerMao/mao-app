@@ -1,57 +1,31 @@
 package com.mao.service
 
 import com.mao.config.JwtConfig
-import com.mao.entity.ErrorCode
-import com.mao.entity.auth.LoginRequest
-import com.mao.entity.auth.RefreshRequest
-import com.mao.entity.auth.RsaKey
-import com.mao.entity.auth.TokenResponse
+import com.mao.entity.*
 import com.mao.ex.AppException
 import com.mao.extension.JwtService
-import com.mao.util.RsaUtils
+import com.mao.extension.PasswordHandler
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import kotlin.math.abs
 
 @Service
 class AuthService(
     private val userDetailsService: ReactiveUserDetailsService,
     private val passwordEncoder: PasswordEncoder,
+    private val passwordHandler: PasswordHandler,
     private val jwtService: JwtService,
     private val jwtConfig: JwtConfig
 ) {
-
-    private val log = LoggerFactory.getLogger(javaClass)
 
     suspend fun key(): RsaKey = RsaKey(jwtService.getPublicKey())
 
     suspend fun login(request: LoginRequest): TokenResponse {
         // 前置检查入参
         val username = request.username ?: throw AppException(ErrorCode.BAD_REQUEST)
-        val password = request.password ?: throw AppException(ErrorCode.BAD_REQUEST)
-        val timestamp = request.timestamp ?: throw AppException(ErrorCode.BAD_REQUEST)
-        // 防止重放攻击，校验时间戳，允许30秒窗口期
-        val now = System.currentTimeMillis()
-        if (abs(now - timestamp) > 30000) {
-            throw AppException(ErrorCode.AUTHENTICATION_TIMEOUT)
-        }
-        // 解密
-        val privateKey = jwtService.getPrivateKey()
-        val rawPasswordWithTimestamp = try {
-            RsaUtils.decrypt(password, privateKey)
-        } catch (e: Exception) {
-            log.error("Error decrypting password: ", e)
-            throw AppException(ErrorCode.BAD_AUTHENTICATION_REQUEST)
-        }
-        // 检验密码格式是否正确
-        if (!rawPasswordWithTimestamp.endsWith(":$timestamp")) {
-            throw AppException(ErrorCode.BAD_REQUEST)
-        }
         // 提取出真正的明文密码
-        val rawPassword = rawPasswordWithTimestamp.removeSuffix(":$timestamp")
+        val rawPassword = passwordHandler.decryptPassword(request.password, request.timestamp)
 
         return createToken(username, rawPassword)
     }

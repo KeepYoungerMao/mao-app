@@ -94,7 +94,7 @@ CREATE TABLE `sys_user`
     `enabled` TINYINT DEFAULT 1 COMMENT '是否可使用',
     `expired` TINYINT DEFAULT 0 COMMENT '是否过期',
     `locked` TINYINT DEFAULT 0 COMMENT '是否锁定',
-    `expire_time` BIGINT COMMENT '过期时间',
+    `expire_time` DATETIME(3) COMMENT '过期时间',
     `last_login_time` DATETIME(3) COMMENT '上次登陆时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',

@@ -1,8 +1,8 @@
 package com.mao.filter
 
 import com.mao.entity.Operation
+import com.mao.entity.OperationLogDo
 import com.mao.entity.OperationModule
-import com.mao.entity.domain.OperationLogDo
 import com.mao.extension.OperationLog
 import com.mao.extension.OperationLogHandler
 import com.mao.util.currentUser

@@ -1,13 +1,6 @@
 package com.mao.controller
 
-import com.mao.entity.Operation
-import com.mao.entity.OperationModule
-import com.mao.entity.PageResponse
-import com.mao.entity.query.IdQo
-import com.mao.entity.query.UserAddQo
-import com.mao.entity.query.UserQo
-import com.mao.entity.query.UserUpdateQo
-import com.mao.entity.view.UserVo
+import com.mao.entity.*
 import com.mao.extension.OperationLog
 import com.mao.service.UserService
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,5 +28,29 @@ class UserController(private val userService: UserService) {
     @PostMapping("update")
     @OperationLog(operation = Operation.UPDATE)
     suspend fun updateUser(@RequestBody request: UserUpdateQo): UserVo = userService.updateUser(request)
+
+    @PostMapping("password/update")
+    @OperationLog(operation = Operation.PASSWORD_UPDATE)
+    suspend fun updateUserPassword(@RequestBody request: UserPasswordUpdateQo): Tips = userService.updateUserPassword(request)
+
+    @PostMapping("password/reset")
+    @OperationLog(operation = Operation.PASSWORD_RESET)
+    suspend fun resetUserPassword(@RequestBody request: UserPasswordResetQo): Tips = userService.resetUserPassword(request)
+
+    @PostMapping("renewal")
+    @OperationLog(operation = Operation.USER_RENEWAL)
+    suspend fun renewUser(@RequestBody request: UserRenewalQo): UserVo = userService.renewUser(request)
+
+    @PostMapping("lock")
+    @OperationLog(operation = Operation.USER_LOCKED)
+    suspend fun lockUser(@RequestBody request: IdQo<Int>): UserVo = userService.lockUser(request.id)
+
+    @PostMapping("unlock")
+    @OperationLog(operation = Operation.USER_LOCKED)
+    suspend fun unlockUser(@RequestBody request: IdQo<Int>): UserVo = userService.unlockUser(request.id)
+
+    @PostMapping("delete")
+    @OperationLog(operation = Operation.DELETE)
+    suspend fun deleteUser(@RequestBody request: IdQo<Int>): Tips = userService.deleteUser(request.id)
 
 }

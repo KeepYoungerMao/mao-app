@@ -1,4 +1,4 @@
-package com.mao.extension
+package com.mao.listener
 
 /**
  * 用户创建成功后事件

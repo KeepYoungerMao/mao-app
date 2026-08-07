@@ -1,6 +1,6 @@
 package com.mao.extension
 
-import com.mao.entity.domain.OperationLogDo
+import com.mao.entity.OperationLogDo
 import com.mao.repository.OperationLogRepository
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.CoroutineScope

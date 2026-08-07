@@ -6,6 +6,7 @@ import com.mao.ex.AppException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -38,6 +39,19 @@ class GlobalExceptionHandler {
     fun handleBusinessException(e: AppException): Mono<Response<Nothing?>> {
         log.warn("业务异常: {}", e.message)
         return Mono.just(Response.error( e.code.code, e.message ?: "业务异常"))
+    }
+
+    /**
+     * 捕获鉴权失败异常
+     * 由于添加了全局异常拦截器，SecurityConfiguration中配置的accessDeniedHandler到达不了，
+     * 会被下方的#handleThrowable()方法捕获
+     * 因此需要该异常拦截
+     */
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleAccessDeniedException(e: AccessDeniedException): Mono<Response<Nothing?>> {
+        log.error("鉴权异常: {}", e.message)
+        return Mono.just(Response.error(ErrorCode.NO_PERMISSION))
     }
 
     /**
