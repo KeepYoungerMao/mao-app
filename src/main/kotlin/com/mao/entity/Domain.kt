@@ -36,6 +36,14 @@ data class UserDo(
     var mustChangePassword: Boolean? = null,
 ) : BaseDo()
 
+@Table("sys_user_role_ref")
+data class UserRoleRefDo(
+    @Id
+    val id: Int,
+    val userId: Int,
+    val roleId: Int
+)
+
 /**
  * 角色
  */
@@ -46,6 +54,14 @@ data class RoleDo(
     var name: String? = null,
     var description: String? = null,
 ) : BaseDo()
+
+@Table("sys_role_permission_ref")
+data class RolePermissionRefDo(
+    @Id
+    val id: Int,
+    val roleId: Int,
+    val permissionId: Int
+)
 
 /**
  * 系统操作日志

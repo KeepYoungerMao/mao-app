@@ -1,9 +1,15 @@
 package com.mao.config
 
+import com.mao.extension.CaffeineUserPermissionCache
 import com.mao.extension.GlobalResponseResultHandler
+import com.mao.extension.RolePermissionCache
+import com.mao.repository.RolePermissionRefRepository
+import com.mao.repository.UserRoleRefRepository
 import io.micrometer.context.ContextRegistry
 import jakarta.annotation.PostConstruct
 import org.slf4j.MDC
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -114,6 +120,18 @@ class AppConfiguration {
                 .map { authentication -> authentication.name }
                 .switchIfEmpty(Mono.just("admin"))
         }
+    }
+
+    /**
+     * 创建角色权限本地缓存
+     */
+    @Bean
+    @ConditionalOnMissingClass("org.springframework.data.redis.connection.ReactiveRedisConnectionFactory")
+    @ConditionalOnClass(name = ["com.github.benmanes.caffeine.cache.Caffeine"])
+    fun localUserPermissionCache(jwtConfig: JwtConfig,
+                                 userRoleRefRepository: UserRoleRefRepository,
+                                 rolePermissionRefRepository: RolePermissionRefRepository) : RolePermissionCache {
+        return CaffeineUserPermissionCache(jwtConfig, userRoleRefRepository, rolePermissionRefRepository)
     }
 
 }

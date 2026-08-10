@@ -39,7 +39,6 @@ class JwtService(
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plusMillis(jwtConfig.accessTokenExpiration)))
             .claim("type", "access")
-            .claim("roles", user.authorities.map { it.authority }.toSet())
             .issuer("auth-server")
             .build()
         return sign(claims)

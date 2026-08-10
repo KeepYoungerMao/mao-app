@@ -49,6 +49,14 @@ class UserController(private val userService: UserService) {
     @OperationLog(operation = Operation.USER_LOCKED)
     suspend fun unlockUser(@RequestBody request: IdQo<Int>): UserVo = userService.unlockUser(request.id)
 
+    @PostMapping("enable")
+    @OperationLog(operation = Operation.USER_ENABLED)
+    suspend fun enableUser(@RequestBody request: IdQo<Int>): UserVo = userService.enableUser(request.id)
+
+    @PostMapping("disable")
+    @OperationLog(operation = Operation.USER_ENABLED)
+    suspend fun disableUser(@RequestBody request: IdQo<Int>): UserVo = userService.disableUser(request.id)
+
     @PostMapping("delete")
     @OperationLog(operation = Operation.DELETE)
     suspend fun deleteUser(@RequestBody request: IdQo<Int>): Tips = userService.deleteUser(request.id)

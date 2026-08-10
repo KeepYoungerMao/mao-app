@@ -2,7 +2,6 @@ package com.mao.entity
 
 import com.mao.ex.AppException
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.io.Serializable
 
@@ -20,9 +19,7 @@ data class AuthUserDetails(
 ): UserDetails, Serializable {
 
     companion object {
-        fun create(userDo: UserDo, permissions: Collection<String>): AuthUserDetails {
-            val authorities = HashSet<GrantedAuthority>()
-            permissions.forEach { authorities.add(SimpleGrantedAuthority(it)) }
+        fun create(userDo: UserDo): AuthUserDetails {
             return AuthUserDetails(
                 username = userDo.username ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 password = userDo.password ?: throw AppException(ErrorCode.USER_NOT_FOUND),
@@ -30,7 +27,7 @@ data class AuthUserDetails(
                 locked = userDo.locked ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 enabled = userDo.enabled ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 mustChangePassword = userDo.mustChangePassword ?: throw AppException(ErrorCode.USER_NOT_FOUND),
-                authorities = authorities
+                authorities = emptySet(),
             )
         }
     }

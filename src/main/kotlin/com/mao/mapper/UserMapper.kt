@@ -20,7 +20,6 @@ class UserMapper {
         userUpdate.avatar?.let { avatar = it }
         userUpdate.phone?.let { phone = it }
         userUpdate.email?.let { email = it }
-        userUpdate.expireTime?.let { expireTime = it }
      }
 
 }

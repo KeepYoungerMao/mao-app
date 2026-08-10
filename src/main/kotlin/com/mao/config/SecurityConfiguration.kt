@@ -1,14 +1,17 @@
 package com.mao.config
 
 import com.mao.extension.CustomAuthHandler
+import com.mao.extension.RolePermissionCache
 import com.mao.util.RsaUtils
 import com.nimbusds.jose.jwk.RSAKey
+import kotlinx.coroutines.reactor.mono
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.config.web.server.invoke
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -32,40 +35,62 @@ class SecurityConfiguration(
 
     @Bean
     fun securityFilterChain(http: ServerHttpSecurity,
-                            jwtDecoder: ReactiveJwtDecoder,
-                            jwtAuthenticationConverter: ReactiveJwtAuthenticationConverter): SecurityWebFilterChain {
-        return http
-            .csrf { it.disable() }
-            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-            .authorizeExchange {
-                exchanges -> exchanges.pathMatchers("/api/v1/auth/**").permitAll()
-                    .anyExchange().authenticated()
-            }.oauth2ResourceServer {
-                oauth2 -> oauth2.jwt {
-                    jwt -> jwt.jwtDecoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter)
-                }
-                oauth2.authenticationEntryPoint(authHandler)
-                oauth2.accessDeniedHandler(authHandler)
-            }
-            .build()
-    }
+                            reactiveJwtDecoder: ReactiveJwtDecoder,
+                            reactiveJwtAuthenticationConverter: ReactiveJwtAuthenticationConverter
+    ): SecurityWebFilterChain {
 
-    @Bean
-    fun reactiveJwtDecoder(rsaKey: RSAKey): ReactiveJwtDecoder {
-        return NimbusReactiveJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build()
+        return http {
+            // 跨站请求伪造 关闭
+            csrf { disable() }
+            // 无状态会话
+            securityContextRepository = NoOpServerSecurityContextRepository.getInstance()
+            // 接口授权
+            authorizeExchange {
+                authorize("/api/v1/auth/**", permitAll)
+                authorize(anyExchange, authenticated)
+            }
+            // oauth2
+            oauth2ResourceServer {
+                jwt {
+                    jwtDecoder = reactiveJwtDecoder
+                    jwtAuthenticationConverter = reactiveJwtAuthenticationConverter
+                }
+                authenticationEntryPoint = authHandler
+                accessDeniedHandler = authHandler
+            }
+        }
     }
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
+    /**
+     * JWT解析
+     * 注册公钥数据
+     */
     @Bean
-    fun jwtAuthenticationConverter(): ReactiveJwtAuthenticationConverter {
+    fun reactiveJwtDecoder(rsaKey: RSAKey): ReactiveJwtDecoder {
+        return NimbusReactiveJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build()
+    }
+
+    /**
+     * 自定义权限转换器
+     * 默认ReactiveJwtAuthenticationConverter直接洗scp/scope范围权限，一般为 read write admin
+     * 我们要存储自定义权限不会进行解析
+     */
+    @Bean
+    fun reactiveJwtAuthenticationConverter(rolePermissionCache: RolePermissionCache): ReactiveJwtAuthenticationConverter {
         val converter = ReactiveJwtAuthenticationConverter()
+        // 根据username实时查询权限信息
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
-            val authorities = mutableSetOf<GrantedAuthority>()
-            // TODO 添加权限列表
-            authorities.add(SimpleGrantedAuthority("ROLE_admin"))
-            Flux.fromIterable(authorities)
+            mono {
+                rolePermissionCache.get(jwt.subject)
+            }.flatMapMany { permissionData ->
+                val authorities = mutableSetOf<GrantedAuthority>()
+                permissionData.roles.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
+                permissionData.permissions.forEach { authorities.add(SimpleGrantedAuthority(it)) }
+                Flux.fromIterable(authorities)
+            }
         }
         return converter
     }

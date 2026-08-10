@@ -93,6 +93,7 @@ enum class Operation {
     PASSWORD_RESET,     // 特殊 密码重置
     USER_RENEWAL,       // 特殊 用户续期
     USER_LOCKED,        // 特殊 用户解锁/锁定
+    USER_ENABLED,       // 特殊 用户启用/停用
 
     ERROR,
 

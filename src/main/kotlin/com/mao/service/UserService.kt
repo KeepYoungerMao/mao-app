@@ -113,6 +113,20 @@ class UserService(
         return userMapper.toVo(user)
     }
 
+    suspend fun enableUser(id: Int?): UserVo {
+        val user = userRepository.findByIdOrThrow(id)
+        user.enabled = true
+        userRepository.save(user)
+        return userMapper.toVo(user)
+    }
+
+    suspend fun disableUser(id: Int?): UserVo {
+        val user = userRepository.findByIdOrThrow(id)
+        user.enabled = false
+        userRepository.save(user)
+        return userMapper.toVo(user)
+    }
+
     /**
      * 删除用户数据
      * 谨慎操作：删除用户会同时删除：用户资料、用户教育经历、工作经历、人群关系、递交材料等信息

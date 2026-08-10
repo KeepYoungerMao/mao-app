@@ -47,6 +47,8 @@ dependencies {
     runtimeOnly("io.asyncer:r2dbc-mysql")
     // 上下文传递
     implementation("io.micrometer:context-propagation")
+    // 本地缓存
+    implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("org.springframework.boot:spring-boot-starter-data-r2dbc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
