@@ -4,6 +4,7 @@ import com.mao.entity.UserAddQo
 import com.mao.entity.UserDo
 import com.mao.entity.UserUpdateQo
 import com.mao.entity.UserVo
+import com.mao.util.DesensitizeUtils
 import org.springframework.stereotype.Component
 import tech.mappie.api.ObjectMappie
 
@@ -25,7 +26,9 @@ class UserMapper {
 }
 
 object UserViewMapper: ObjectMappie<UserDo, UserVo>() {
-    override fun map(from: UserDo): UserVo = mapping {}
+    override fun map(from: UserDo): UserVo = mapping {
+        to::phone fromExpression  { DesensitizeUtils.desensitizePhone(from.phone) }
+    }
 }
 
 object UserCreateMapper: ObjectMappie<UserAddQo, UserDo>() {

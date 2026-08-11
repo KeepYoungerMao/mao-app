@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/user")
 @OperationLog(module = OperationModule.USER)
-class UserController(private val userService: UserService) {
+class UserController(
+    private val userService: UserService
+) {
 
     @PostMapping("page")
     @OperationLog(operation = Operation.PAGE)
@@ -56,6 +58,14 @@ class UserController(private val userService: UserService) {
     @PostMapping("disable")
     @OperationLog(operation = Operation.USER_ENABLED)
     suspend fun disableUser(@RequestBody request: IdQo<Int>): UserVo = userService.disableUser(request.id)
+
+    @PostMapping("role/update")
+    @OperationLog(operation = Operation.USER_ROLE)
+    suspend fun updateUserRole(@RequestBody request: UserRoleUpdateQo): Tips = userService.updateUserRole(request)
+
+    @PostMapping("profile/update")
+    @OperationLog(module = OperationModule.USER_PROFILE, operation = Operation.USER_ROLE)
+    suspend fun updateUserProfile(@RequestBody request: UserProfileUpdateQo): UserProfileVo = userService.updateUserProfile(request)
 
     @PostMapping("delete")
     @OperationLog(operation = Operation.DELETE)

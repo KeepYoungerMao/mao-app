@@ -58,6 +58,7 @@ enum class OperationScope {
 enum class OperationModule(val scope: OperationScope) {
 
     USER(OperationScope.SYSTEM),
+    USER_PROFILE(OperationScope.SYSTEM),
     ROLE(OperationScope.SYSTEM),
     PERMISSION(OperationScope.SYSTEM),
     OPERATION_LOG(OperationScope.SYSTEM),
@@ -94,6 +95,8 @@ enum class Operation {
     USER_RENEWAL,       // 特殊 用户续期
     USER_LOCKED,        // 特殊 用户解锁/锁定
     USER_ENABLED,       // 特殊 用户启用/停用
+    USER_ROLE,          // 特殊 用户更新角色
+    ROLE_PERMISSION,    // 特殊 角色更新权限
 
     ERROR,
 

@@ -1,5 +1,6 @@
 package com.mao.entity
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -34,6 +35,37 @@ data class UserVo(
     val expireTime: LocalDateTime? = null,
     val lastLoginTime: LocalDateTime? = null
 ) : BaseVo()
+
+data class UserProfileVo(
+    val id: Int? = null,
+    val userId: Int? = null,
+    val userCode: String? = null,
+    val realName: String? = null,
+    val sexId: Int? = null,
+    val entryDate: LocalDate? = null,
+    val idCardNum: String? = null,
+    val bloodTypeId: Int? = null,
+    val high: Double? = null,
+    val weight: Double? = null,
+    val provinceId: Int? = null,
+    val cityId: Int? = null,
+    val districtId: Int? = null,
+    val address: String? = null,
+    val birthday: LocalDate? = null,
+    val nationId: Int? = null,
+    val countryId: Int? = null,
+    val maritalId: Int? = null,
+    val politicalId: Int? = null,
+    val educationId: Int? = null,
+    val major: String? = null,
+    val originProvinceId: Int? = null,
+    val originCityId: Int? = null,
+    val originDistrictId: Int? = null,
+    val originAddress: String? = null,
+    val familyPhone: String? = null,
+    val hobby: String? = null,
+    val remark: String? = null
+) : BaseDo()
 
 /**
  * 系统操作日志

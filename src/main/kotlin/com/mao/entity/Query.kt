@@ -1,6 +1,7 @@
 package com.mao.entity
 
 import com.mao.extension.QueryField
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -48,6 +49,7 @@ data class UserQo(
 
 /**
  * 新增用户数据参数
+ * 包含账号数据和用户资料数据
  */
 data class UserAddQo(
     val username: String? = null,
@@ -55,6 +57,10 @@ data class UserAddQo(
     val phone: String? = null,
     val email: String? = null,
     val expireTime: LocalDateTime? = null,
+    val realName: String? = null,
+    val entryDate: LocalDate? = null,
+    val idCardNum: String? = null,
+    val birthday: LocalDate? = null,
 )
 
 /**
@@ -89,12 +95,46 @@ data class UserPasswordResetQo(val username: String? = null)
 data class UserRenewalQo(val username: String? = null, val expireTime: LocalDateTime? = null)
 
 /**
+ * 用户更新角色信息参数
+ */
+data class UserRoleUpdateQo(val id: Int? = null, val roleIds: List<Int>? = null)
+
+/**
  * 角色数据查询参数
  */
 data class RoleQo(
     @QueryField(type = QueryField.Type.LIKE)
     val name: String? = null,
 ) : PageQo()
+
+/**
+ * 用户资料更新数据
+ */
+data class UserProfileUpdateQo(
+    val id: Int? = null,
+    val sexId: Int? = null,
+    val bloodTypeId: Int? = null,
+    val high: Double? = null,
+    val weight: Double? = null,
+    val provinceId: Int? = null,
+    val cityId: Int? = null,
+    val districtId: Int? = null,
+    val address: String? = null,
+    val birthday: LocalDate? = null,
+    val nationId: Int? = null,
+    val countryId: Int? = null,
+    val maritalId: Int? = null,
+    val politicalId: Int? = null,
+    val educationId: Int? = null,
+    val major: String? = null,
+    val originProvinceId: Int? = null,
+    val originCityId: Int? = null,
+    val originDistrictId: Int? = null,
+    val originAddress: String? = null,
+    val familyPhone: String? = null,
+    val hobby: String? = null,
+    val remark: String? = null
+)
 
 /**
  * 系统操作日志查询参数

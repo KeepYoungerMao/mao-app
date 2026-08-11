@@ -26,7 +26,7 @@ class UserEventListener(
                     from = fromEmail
                     setTo(event.email)
                     subject = "用户创建成功通知"
-                    text = "感谢您使用 MAO-APP，您已成功创建用户，初始密码为：\n${event.password}\n为了您的账号安全，请在首次登陆后尽快更改密码。"
+                    text = "尊敬的 ${event.name} 先生/女士：\n感谢您使用 MAO-APP，您已成功创建用户，初始密码为：\n${event.password}\n为了您的账号安全，请在首次登陆后尽快更改密码。"
                 }
                 mailSender.send(message)
             }.onFailure { e ->

@@ -6,8 +6,12 @@ import com.mao.extension.PasswordHandler
 import com.mao.listener.UserCreateEvent
 import com.mao.listener.UserPasswordResetEvent
 import com.mao.mapper.UserMapper
+import com.mao.mapper.UserProfileMapper
+import com.mao.repository.UserProfileRepository
 import com.mao.repository.UserRepository
+import com.mao.repository.UserRoleRefRepository
 import com.mao.util.currentUser
+import kotlinx.coroutines.flow.count
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -21,7 +25,10 @@ class UserService(
     private val userMapper: UserMapper,
     private val passwordEncoder: PasswordEncoder,
     private val passwordHandler: PasswordHandler,
-    private val eventPublisher: ApplicationEventPublisher
+    private val eventPublisher: ApplicationEventPublisher,
+    private val userRoleRefRepository: UserRoleRefRepository,
+    private val userProfileRepository: UserProfileRepository,
+    private val userProfileMapper: UserProfileMapper
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -34,10 +41,11 @@ class UserService(
         return userRepository.findByIdOrThrow(id).let { userMapper.toVo(it) }
     }
 
+    @Transactional
     suspend fun saveUser(userAdd: UserAddQo): UserVo {
         // 生成密码
         val password = passwordHandler.generatePassword()
-        // 补齐默认参数
+        // 补齐用户默认参数
         val userDo: UserDo = userMapper.toDo(userAdd).apply {
             this.password = passwordEncoder.encode(password)
             this.enabled = true
@@ -47,8 +55,15 @@ class UserService(
         }
         // 保存用户数据
         val savedUser: UserDo = userRepository.save(userDo)
+        // 补齐用户资料参数
+        val userProfileDo: UserProfileDo = userProfileMapper.toDo(userAdd).apply {
+            this.userId = savedUser.id
+            this.userCode = "MS${savedUser.id}"
+        }
+        // 保存用户资料数据
+        val savedUserProfile = userProfileRepository.save(userProfileDo)
         // 发布邮箱通知事件
-        eventPublisher.publishEvent(UserCreateEvent(savedUser.email!!, password))
+        eventPublisher.publishEvent(UserCreateEvent(savedUserProfile.realName!!, savedUser.email!!, password))
         return userMapper.toVo(savedUser)
     }
 
@@ -127,6 +142,32 @@ class UserService(
         return userMapper.toVo(user)
     }
 
+    @Transactional
+    suspend fun updateUserRole(userRoleUpdate: UserRoleUpdateQo): Tips {
+        val id = userRoleUpdate.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val roleIds = userRoleUpdate.roleIds ?: throw AppException(ErrorCode.BAD_REQUEST)
+        // 查询用户
+        val user = userRepository.findById(id) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
+        val operateUser = currentUser()
+        log.info("user: [{}] operate: update user[{}] role ref.", operateUser, user.username)
+        // 删除旧关联
+        val count = userRoleRefRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete old user [{}] role ref [count: {}]", operateUser, user.username, count)
+        // 新增新数据
+        val userRoleRefs = roleIds.map { UserRoleRefDo(id = null, userId = user.id!!, roleId = it) }
+        val refs = userRoleRefRepository.saveAll(userRoleRefs)
+        log.info("user: [{}] operate: add new user [{}] role ref [count: {}]", operateUser, user.username, refs.count())
+        return Tips("角色更新成功")
+    }
+
+    suspend fun updateUserProfile(userProfileUpdate: UserProfileUpdateQo): UserProfileVo {
+        val id = userProfileUpdate.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val userProfile = userProfileRepository.findById(id) ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val userProfileUpdate = userProfileMapper.copyToExistDo(userProfileUpdate, userProfile)
+        userProfileRepository.save(userProfileUpdate)
+        return userProfileMapper.toVo(userProfile)
+    }
+
     /**
      * 删除用户数据
      * 谨慎操作：删除用户会同时删除：用户资料、用户教育经历、工作经历、人群关系、递交材料等信息
@@ -139,7 +180,7 @@ class UserService(
         log.info("user: [{}] operate: delete user [{}]", operateUser, user.username)
         userRepository.deleteById(user.id!!)
         // delete user_role_ref
-        val count1 = userRepository.deleteUserRoleRefByUserId(user.id!!)
+        val count1 = userRoleRefRepository.deleteByUserId(user.id!!)
         log.info("user: [{}] operate: delete user [{}] role ref [count: {}]", operateUser, user.username, count1)
         // TODO delete user_profile_*
         return Tips("数据删除成功")
