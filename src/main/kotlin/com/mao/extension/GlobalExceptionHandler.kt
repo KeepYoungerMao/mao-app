@@ -61,12 +61,12 @@ class GlobalExceptionHandler {
     @ExceptionHandler(WebExchangeBindException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleWebExchangeBindException(e: WebExchangeBindException): Mono<Response<Nothing?>> {
-        // 直接使用 Kotlin 的 joinToString，一行搞定 map + join，无需 Stream 流
-        val errMsg = e.bindingResult.fieldErrors
-            .joinToString(separator = "; ") { it.defaultMessage ?: "参数错误" }
+        val errors = e.bindingResult.fieldErrors.map { fieldError ->
+            "参数[${fieldError.field}]${fieldError.defaultMessage ?: "不符合规范"}"
+        }.joinToString(separator = "; ")
 
-        log.warn("参数校验异常: {}", errMsg)
-        return Mono.just(Response.error(ErrorCode.BAD_REQUEST.code, errMsg))
+        log.warn("参数校验异常: {}", errors)
+        return Mono.just(Response.error(ErrorCode.BAD_REQUEST.code, errors))
     }
 
     /**

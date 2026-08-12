@@ -1,8 +1,8 @@
 package com.mao.config
 
-import com.mao.extension.CaffeineUserPermissionCache
+import com.mao.extension.CaffeineUserRolePermissionCache
 import com.mao.extension.GlobalResponseResultHandler
-import com.mao.extension.RolePermissionCache
+import com.mao.extension.UserRolePermissionCache
 import com.mao.repository.RolePermissionRefRepository
 import com.mao.repository.UserRoleRefRepository
 import io.micrometer.context.ContextRegistry
@@ -18,6 +18,7 @@ import org.springframework.data.domain.ReactiveAuditorAware
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
 import org.springframework.http.codec.ServerCodecConfigurer
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
@@ -130,8 +131,19 @@ class AppConfiguration {
     @ConditionalOnClass(name = ["com.github.benmanes.caffeine.cache.Caffeine"])
     fun localUserPermissionCache(jwtConfig: JwtConfig,
                                  userRoleRefRepository: UserRoleRefRepository,
-                                 rolePermissionRefRepository: RolePermissionRefRepository) : RolePermissionCache {
-        return CaffeineUserPermissionCache(jwtConfig, userRoleRefRepository, rolePermissionRefRepository)
+                                 rolePermissionRefRepository: RolePermissionRefRepository) : UserRolePermissionCache {
+        return CaffeineUserRolePermissionCache(jwtConfig, userRoleRefRepository, rolePermissionRefRepository)
+    }
+
+    /**
+     * Spring Validation
+     * 设置快速失败模式
+     */
+    @Bean
+    fun validator(): LocalValidatorFactoryBean {
+        val validator = LocalValidatorFactoryBean()
+        validator.validationPropertyMap["hibernate.validator.fail_fast"] = "true"
+        return validator
     }
 
 }

@@ -1,9 +1,12 @@
 package com.mao
 
 import com.mao.entity.UserAddQo
+import com.mao.extension.IdCard
 import com.mao.mapper.UserCreateMapper
 import com.mao.mapper.UserProfileCreateMapper
 import com.mao.util.RsaUtils
+import jakarta.validation.Validation
+import jakarta.validation.Validator
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -51,6 +54,28 @@ class AppTests {
         println(user)
         val userProfile = UserProfileCreateMapper.map(userAdd)
         println(userProfile)
+    }
+
+    data class IdCardTest(@field:IdCard val idCardNum: String?)
+
+    @Test
+    fun testIdCardValidator() {
+        val validator = Validation.buildDefaultValidatorFactory().validator
+        validate("362202199404244019", validator)
+        validate("36220219940424401X", validator)
+        validate("110101481231002", validator)
+    }
+
+    private fun validate(id: String, validator: Validator) {
+        val violations = validator.validate(IdCardTest(id))
+        if (violations.isEmpty()) {
+            println("Validation successful")
+        } else {
+            println("validation errors")
+            violations.forEach {
+                println(it.message)
+            }
+        }
     }
 
 }

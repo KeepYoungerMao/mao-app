@@ -19,7 +19,7 @@ data class RolePermissionData(val username: String, val roles: List<String>, val
 /**
  * 角色权限信息的缓存
  */
-interface RolePermissionCache {
+interface UserRolePermissionCache {
     suspend fun cache(rolePermissionData: RolePermissionData)
     suspend fun get(username: String?): RolePermissionData?
     suspend fun evict(username: String)
@@ -31,11 +31,11 @@ interface RolePermissionCache {
  * 本地缓存方式
  * 使用Caffeine
  */
-class CaffeineUserPermissionCache(
+class CaffeineUserRolePermissionCache(
     jwtConfig: JwtConfig,
     private val userRoleRefRepository: UserRoleRefRepository,
     private val rolePermissionRefRepository: RolePermissionRefRepository
-) : RolePermissionCache {
+) : UserRolePermissionCache {
 
     private val cache = Caffeine.newBuilder()
         .expireAfterWrite(jwtConfig.accessTokenExpiration, TimeUnit.MILLISECONDS)

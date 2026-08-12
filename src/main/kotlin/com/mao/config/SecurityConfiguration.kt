@@ -1,7 +1,7 @@
 package com.mao.config
 
 import com.mao.extension.CustomAuthHandler
-import com.mao.extension.RolePermissionCache
+import com.mao.extension.UserRolePermissionCache
 import com.mao.util.RsaUtils
 import com.nimbusds.jose.jwk.RSAKey
 import kotlinx.coroutines.reactor.mono
@@ -79,12 +79,12 @@ class SecurityConfiguration(
      * 我们要存储自定义权限不会进行解析
      */
     @Bean
-    fun reactiveJwtAuthenticationConverter(rolePermissionCache: RolePermissionCache): ReactiveJwtAuthenticationConverter {
+    fun reactiveJwtAuthenticationConverter(userRolePermissionCache: UserRolePermissionCache): ReactiveJwtAuthenticationConverter {
         val converter = ReactiveJwtAuthenticationConverter()
         // 根据username实时查询权限信息
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
             mono {
-                rolePermissionCache.get(jwt.subject)
+                userRolePermissionCache.get(jwt.subject)
             }.flatMapMany { permissionData ->
                 val authorities = mutableSetOf<GrantedAuthority>()
                 permissionData.roles.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
