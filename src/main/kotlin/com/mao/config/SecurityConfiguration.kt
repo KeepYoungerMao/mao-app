@@ -1,6 +1,7 @@
 package com.mao.config
 
 import com.mao.extension.CustomAuthHandler
+import com.mao.extension.RolePermissionData
 import com.mao.extension.UserRolePermissionCache
 import com.mao.util.RsaUtils
 import com.nimbusds.jose.jwk.RSAKey
@@ -84,7 +85,7 @@ class SecurityConfiguration(
         // 根据username实时查询权限信息
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
             mono {
-                userRolePermissionCache.get(jwt.subject)
+                userRolePermissionCache.get(jwt.subject) ?: RolePermissionData("", emptyList(), emptyList())
             }.flatMapMany { permissionData ->
                 val authorities = mutableSetOf<GrantedAuthority>()
                 permissionData.roles.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
