@@ -96,6 +96,10 @@ class SecurityConfiguration(
         return converter
     }
 
+    /**
+     * ## 注册RSA密钥
+     * 该密钥将用于 jwt token加解密，和用户密码非明文上传。
+     */
     @Bean
     fun rsaKey(): RSAKey {
         val publicKey = RsaUtils.parsePublicKey(jwtConfig.publicKey)

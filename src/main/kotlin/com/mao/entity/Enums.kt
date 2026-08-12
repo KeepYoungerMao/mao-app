@@ -75,7 +75,7 @@ enum class OperationModule(val scope: OperationScope) {
     POEM(OperationScope.DATA),
     POET(OperationScope.DATA),
 
-    ERROR(OperationScope.SYSTEM),
+    UNSET(OperationScope.SYSTEM),
 
 }
 
@@ -84,11 +84,12 @@ enum class OperationModule(val scope: OperationScope) {
  */
 enum class Operation {
 
-    PAGE,
-    DETAIL,
-    CREATE,
-    UPDATE,
-    DELETE,
+    ALL,                // 用于查询所有数据
+    PAGE,               // 用于分页查询数据
+    DETAIL,             // 用于查询数据详情
+    CREATE,             // 用户新增数据
+    UPDATE,             // 用于更新数据
+    DELETE,             // 用于删除数据
 
     PASSWORD_UPDATE,    // 特殊 密码更新
     PASSWORD_RESET,     // 特殊 密码重置
@@ -98,6 +99,6 @@ enum class Operation {
     USER_ROLE,          // 特殊 用户更新角色
     ROLE_PERMISSION,    // 特殊 角色更新权限
 
-    ERROR,
+    UNSET,
 
 }

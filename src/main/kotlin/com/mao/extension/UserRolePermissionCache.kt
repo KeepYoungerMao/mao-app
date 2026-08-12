@@ -66,7 +66,8 @@ class CaffeineUserRolePermissionCache(
     // 使用 AsyncCache 契合 WebFlux，不仅非阻塞，还能天然防止缓存击穿 (并发请求同一 Key 时只查一次库)
     private val cache: AsyncCache<String, RolePermissionData?> = Caffeine.newBuilder()
         // 设置有效时长为token有效期
-        .expireAfterWrite(jwtConfig.accessTokenExpiration, TimeUnit.MILLISECONDS)
+        // 设置的是只要数据被获取，会重新刷新有效期。（对比于expireAfterWrite不会刷新，而是固定有效期）
+        .expireAfterAccess(jwtConfig.accessTokenExpiration, TimeUnit.MILLISECONDS)
         // 缓存最大量，根据实际用户量调整
         .maximumSize(10_000)
         .buildAsync()

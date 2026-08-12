@@ -9,6 +9,6 @@ import com.mao.entity.OperationModule
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class OperationLog(
-    val module: OperationModule = OperationModule.ERROR,
-    val operation: Operation = Operation.ERROR
+    val module: OperationModule = OperationModule.UNSET,
+    val operation: Operation = Operation.UNSET
 )

@@ -5,6 +5,7 @@ import com.mao.entity.OperationLogDo
 import com.mao.entity.OperationModule
 import com.mao.extension.OperationLog
 import com.mao.extension.OperationLogHandler
+import com.mao.util.WebUtils
 import com.mao.util.currentUser
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -18,11 +19,14 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import java.time.Duration
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class OperationLogFilter(
     private val operationLogHandler: OperationLogHandler
 ) : WebFilter, Ordered {
+
+    private val annotationCache = ConcurrentHashMap<HandlerMethod, LogMeta>()
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         return mono {
@@ -53,29 +57,19 @@ class OperationLogFilter(
         if (handler !is HandlerMethod) return
 
         // 2. 解析注解 (先看方法，方法没有再看类)
-        val methodAnn = handler.getMethodAnnotation(OperationLog::class.java)
-        val classAnn = handler.beanType.getAnnotation(OperationLog::class.java)
+        val logMeta = annotationCache.computeIfAbsent(handler) { resolveLogMeta(it) }
+        if (!logMeta.requiresLogging) return
 
-        if (methodAnn == null) return
-
-        val module = if (methodAnn.module != OperationModule.ERROR) {
-            methodAnn.module
-        } else if (classAnn.module != OperationModule.ERROR) {
-            classAnn.module
-        } else {
-            return
-        }
-        val operation = if (methodAnn.operation != Operation.ERROR) methodAnn.operation else return
         val description = ""
         val username = currentUser() ?: "anonymous"
         val cost = Duration.between(startTime, LocalDateTime.now()).toMillis()
-        val ip = extractIp(exchange)
+        val ip = WebUtils.getIp(exchange)
         val method = exchange.request.method.name()
         val operationLog = OperationLogDo(
             username = username,
-            scope = module.scope.name,
-            module = module.name,
-            operation = operation.name,
+            scope = logMeta.module!!.scope.name,
+            module = logMeta.module.name,
+            operation = logMeta.operation!!.name,
             description = description,
             method = method,
             ip = ip,
@@ -88,26 +82,45 @@ class OperationLogFilter(
     }
 
     /**
-     * 提取真实IP地址的辅助方法
+     * 解析 HandlerMethod 上的注解信息并封装为 LogMeta
      */
-    private fun extractIp(exchange: ServerWebExchange): String {
-        val headers = exchange.request.headers
-        var ip = headers.getFirst("X-Forwarded-For")
-        if (ip.isNullOrBlank() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = headers.getFirst("Proxy-Client-IP")
+    private fun resolveLogMeta(handler: HandlerMethod): LogMeta {
+        val methodAnn = handler.getMethodAnnotation(OperationLog::class.java)
+            ?: return LogMeta.NOT_REQUIRED
+
+        val classAnn = handler.beanType.getAnnotation(OperationLog::class.java)
+
+        // 提取 Module，优先使用方法上的，没有再看类上的
+        val module = if (methodAnn.module != OperationModule.UNSET) {
+            methodAnn.module
+        } else if (classAnn != null && classAnn.module != OperationModule.UNSET) {
+            classAnn.module
+        } else {
+            return LogMeta.NOT_REQUIRED
         }
-        if (ip.isNullOrBlank() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = headers.getFirst("WL-Proxy-Client-IP")
+
+        // 提取 Operation，必须在方法上显式指定
+        val operation = if (methodAnn.operation != Operation.UNSET) {
+            methodAnn.operation
+        } else {
+            return LogMeta.NOT_REQUIRED
         }
-        if (ip.isNullOrBlank() || "unknown".equals(ip, ignoreCase = true)) {
-            ip = exchange.request.remoteAddress?.address?.hostAddress ?: "127.0.0.1"
+
+        return LogMeta(requiresLogging = true, module = module, operation = operation)
+    }
+
+    /**
+     * 内部缓存数据结构
+     */
+    private class LogMeta(
+        val requiresLogging: Boolean,
+        val module: OperationModule? = null,
+        val operation: Operation? = null
+    ) {
+        companion object {
+            // 单例对象，用于负面缓存（表示该方法不需要记录日志）
+            val NOT_REQUIRED = LogMeta(requiresLogging = false)
         }
-        // 如果经过多个反向代理，X-Forwarded-For 的第一个IP才是真实IP
-        ip = ip.split(",")[0].trim()
-        if (ip == "0:0:0:0:0:0:0:1") {
-            ip = "127.0.0.1"
-        }
-        return ip
     }
 
 }
