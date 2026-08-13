@@ -3,8 +3,7 @@ package com.mao.config
 import com.mao.extension.CaffeineUserRolePermissionCache
 import com.mao.extension.GlobalResponseResultHandler
 import com.mao.extension.UserRolePermissionCache
-import com.mao.repository.RolePermissionRefRepository
-import com.mao.repository.UserRoleRefRepository
+import com.mao.service.RoleService
 import io.micrometer.context.ContextRegistry
 import jakarta.annotation.PostConstruct
 import org.slf4j.MDC
@@ -130,9 +129,8 @@ class AppConfiguration {
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.ReactiveRedisConnectionFactory")
     @ConditionalOnClass(name = ["com.github.benmanes.caffeine.cache.Caffeine"])
     fun localUserPermissionCache(jwtConfig: JwtConfig,
-                                 userRoleRefRepository: UserRoleRefRepository,
-                                 rolePermissionRefRepository: RolePermissionRefRepository) : UserRolePermissionCache {
-        return CaffeineUserRolePermissionCache(jwtConfig, userRoleRefRepository, rolePermissionRefRepository)
+                                 roleService: RoleService) : UserRolePermissionCache {
+        return CaffeineUserRolePermissionCache(jwtConfig, roleService)
     }
 
     /**

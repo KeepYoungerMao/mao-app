@@ -20,6 +20,7 @@ java {
 
 springBoot {
     mainClass.set("com.mao.AppKt")
+    buildInfo()
 }
 
 repositories {

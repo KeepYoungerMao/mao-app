@@ -5,6 +5,7 @@ import com.mao.entity.OperationLogDo
 import com.mao.entity.OperationModule
 import com.mao.extension.OperationLog
 import com.mao.extension.OperationLogHandler
+import com.mao.service.SystemService
 import com.mao.util.WebUtils
 import com.mao.util.currentUser
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -23,7 +24,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class OperationLogFilter(
-    private val operationLogHandler: OperationLogHandler
+    private val operationLogHandler: OperationLogHandler,
+    private val systemService: SystemService
 ) : WebFilter, Ordered {
 
     private val annotationCache = ConcurrentHashMap<HandlerMethod, LogMeta>()
@@ -78,7 +80,10 @@ class OperationLogFilter(
             operationTime = startTime,
             cost = cost
         )
+        // 记录交易日志
         operationLogHandler.sendLog(operationLog)
+        // 记录系统指标
+        systemService.recordRequest(cost, errorMsg == null)
     }
 
     /**

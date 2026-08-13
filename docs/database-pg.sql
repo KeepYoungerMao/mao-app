@@ -121,6 +121,34 @@ COMMENT ON COLUMN sys_operate_log.error_message IS '错误信息';
 COMMENT ON COLUMN sys_operate_log.operation_time IS '操作时间';
 COMMENT ON COLUMN sys_operate_log.cost IS '接口耗时';
 
+-- 系统服务指标
+DROP TABLE IF EXISTS sys_server_metric;
+CREATE TABLE sys_server_metric (
+    id              BIGINT        NOT NULL,
+    minute_start    TIMESTAMP     NOT NULL,
+    total_requests  BIGINT        NOT NULL,
+    success_requests BIGINT       NOT NULL,
+    error_requests  BIGINT        NOT NULL,
+    total_response_time_millis BIGINT NOT NULL,
+    avg_response_time_millis  BIGINT NOT NULL,
+    online_users    INTEGER       NOT NULL,
+    login_users     INTEGER       NOT NULL,
+    created_time    TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE (minute_start)
+);
+COMMENT ON TABLE  sys_server_metric IS '系统服务指标';
+COMMENT ON COLUMN sys_server_metric.id IS '主键';
+COMMENT ON COLUMN sys_server_metric.minute_start IS '记录分钟数';
+COMMENT ON COLUMN sys_server_metric.total_requests IS '分钟内总请求数';
+COMMENT ON COLUMN sys_server_metric.success_requests IS '分钟内成功请求数';
+COMMENT ON COLUMN sys_server_metric.error_requests IS '分钟内失败请求数';
+COMMENT ON COLUMN sys_server_metric.total_response_time_millis IS '耗时总和';
+COMMENT ON COLUMN sys_server_metric.avg_response_time_millis IS '平均响应时间';
+COMMENT ON COLUMN sys_server_metric.online_users IS '在线人数';
+COMMENT ON COLUMN sys_server_metric.login_users IS '今日总登陆人数';
+COMMENT ON COLUMN sys_server_metric.created_time IS '创建日期';
+
 -- 用户表
 DROP TABLE IF EXISTS sys_user;
 CREATE TABLE sys_user (

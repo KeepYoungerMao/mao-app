@@ -16,7 +16,8 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val passwordHandler: PasswordHandler,
     private val jwtService: JwtService,
-    private val jwtConfig: JwtConfig
+    private val jwtConfig: JwtConfig,
+    private val systemService: SystemService
 ) {
 
     suspend fun key(): RsaKey = RsaKey(jwtService.getPublicKey())
@@ -26,7 +27,7 @@ class AuthService(
         val username = request.username ?: throw AppException(ErrorCode.BAD_REQUEST)
         // 提取出真正的明文密码
         val rawPassword = passwordHandler.decryptPassword(request.password, request.timestamp)
-
+        // 创建token
         return createToken(username, rawPassword)
     }
 
@@ -39,32 +40,43 @@ class AuthService(
         return createToken(claims.subject)
     }
 
+    /**
+     * ## 创建token
+     * 登录创建token与刷新token逻辑一致，都需要获取一遍用户信息
+     */
     private suspend fun createToken(username: String, password: String? = null): TokenResponse {
-        // 将 Mono<UserDetails> 挂起并解包为 UserDetails?
+        // 获取用户信息，并转为AuthUserDetails
         val userDetails = userDetailsService.findByUsername(username).awaitSingleOrNull()
-            ?: throw AppException(ErrorCode.USER_NOT_FOUND) // 查不到用户时抛出
+            ?: throw AppException(ErrorCode.USER_NOT_FOUND)
+        val authUserDetails = userDetails as AuthUserDetails
 
-        // 3. 账号状态校验（卫语句风格平铺，清晰直观）
-        if (!userDetails.isEnabled) {
+        // 账号状态校验
+        if (!authUserDetails.isEnabled) {
             throw AppException(ErrorCode.USER_UNENABLED)
         }
-        if (!userDetails.isAccountNonExpired) {
+        if (!authUserDetails.isAccountNonExpired) {
             throw AppException(ErrorCode.USER_EXPIRED)
         }
-        if (!userDetails.isAccountNonLocked) {
+        if (!authUserDetails.isAccountNonLocked) {
             throw AppException(ErrorCode.USER_LOCKED)
         }
+        if (authUserDetails.mustChangePassword) {
+            throw AppException(ErrorCode.UNCHANGE_PASSWORD)
+        }
 
-        // 4. 密码校验
+        // 密码校验
         if (password != null) {
             if (!passwordEncoder.matches(password, userDetails.password)) {
                 throw AppException(ErrorCode.PASSWORD_ERROR)
             }
         }
 
-        // 5. 签发 Token 并返回
+        // 签发 Token 并返回
         val accessToken = jwtService.generateAccessToken(userDetails)
         val refreshToken = jwtService.generateRefreshToken(userDetails)
+
+        // 记录登录
+        systemService.recordLogin(authUserDetails.id)
 
         return TokenResponse(
             accessToken = accessToken,

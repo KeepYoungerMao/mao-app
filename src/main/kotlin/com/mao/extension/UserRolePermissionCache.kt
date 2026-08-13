@@ -49,6 +49,8 @@ interface UserRolePermissionCache {
      */
     suspend fun evict(usernames: List<String>)
 
+    fun getTotal(): Int
+
 }
 
 /**
@@ -91,6 +93,10 @@ class CaffeineUserRolePermissionCache(
     override suspend fun evict(usernames: List<String>) {
         // 获取同步视图以执行删除
         cache.synchronous().invalidateAll(usernames)
+    }
+
+    override fun getTotal(): Int {
+        return cache.asMap().keys.size
     }
 
 }

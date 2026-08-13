@@ -9,18 +9,20 @@ import java.io.Serializable
  * 实现spring security的UserDetails的用户数据
  */
 data class AuthUserDetails(
+    val id: Int,
     private val username: String,
     private val password: String?,
     private val expired: Boolean,
     private val locked: Boolean,
     private val enabled: Boolean,
-    private val mustChangePassword: Boolean,
+    val mustChangePassword: Boolean,
     private val authorities: Collection<GrantedAuthority>
 ): UserDetails, Serializable {
 
     companion object {
         fun create(userDo: UserDo): AuthUserDetails {
             return AuthUserDetails(
+                id = userDo.id ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 username = userDo.username ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 password = userDo.password ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 expired = userDo.expired ?: throw AppException(ErrorCode.USER_NOT_FOUND),

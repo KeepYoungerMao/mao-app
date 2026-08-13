@@ -84,3 +84,19 @@ data class OperationLogVo(
     val operationTime: LocalDateTime? = null,
     val cost: Long? = null
 )
+
+/**
+ * 系统信息
+ */
+data class ServerInfo(
+    val serverName: String,         // 应用名称
+    val version: String,            // 版本
+    val startTime: LocalDateTime,   // 程序启动时间
+    val liveTime: String,           // 程序活跃时间
+    val totalRequests: Long,        // 总请求数
+    val successResponse: Long,      // 成功请求书
+    val errorResponse: Long,        // 失败请求数
+    val avgResponse: Long,          // 平均响应时间
+    val onlineUsers: Int,           // 在线用户数
+    val loginUsers: Int,            // 登录用户数
+)

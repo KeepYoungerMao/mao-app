@@ -81,6 +81,24 @@ CREATE TABLE `sys_operation_log`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
+-- 系统服务指标
+DROP TABLE IF EXISTS `sys_server_metric`;
+CREATE TABLE `sys_server_metric`
+(
+    `id` BIGINT NOT NULL COMMENT '主键',
+    `minute_start` DATETIME NOT NULL COMMENT '记录分钟数',
+    `total_requests` BIGINT NOT NULL COMMENT '分钟内总请求数',
+    `success_requests` BIGINT NOT NULL COMMENT '分钟内成功请求数',
+    `error_requests` BIGINT NOT NULL COMMENT '分钟内失败请求数',
+    `total_response_time_millis` BIGINT NOT NULL COMMENT '耗时总和',
+    `avg_response_time_millis` BIGINT NOT NULL COMMENT '平均响应时间',
+    `online_users` INT NOT NULL COMMENT '在线人数',
+    `login_users` INT NOT NULL COMMENT '今日总登陆人数',
+    `created_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建日期',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY (`minute_start`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
 -- 用户
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`

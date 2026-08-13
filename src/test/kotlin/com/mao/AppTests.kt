@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @SpringBootTest
 class AppTests {
@@ -76,6 +77,11 @@ class AppTests {
                 println(it.message)
             }
         }
+    }
+
+    @Test
+    fun getNowSecond() {
+        println(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().epochSecond)
     }
 
 }

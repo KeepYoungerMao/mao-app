@@ -1,6 +1,7 @@
 package com.mao.entity
 
 import org.springframework.data.annotation.*
+import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -115,3 +116,30 @@ data class OperationLogDo(
     var operationTime: LocalDateTime? = null,
     var cost: Long? = null
 )
+
+/**
+ * 系统服务指标数据
+ */
+@Table("sys_server_metric")
+data class ServerMetric(
+    @Id
+    val id: Long,
+    val minuteStart: LocalDateTime,
+    val totalRequests: Long,
+    val successRequests: Long,
+    val errorRequests: Long,
+    val totalResponseTimeMillis: Long,
+    val avgResponseTimeMillis: Long,
+    val onlineUsers: Int,
+    val loginUsers: Int,
+    val createdTime: LocalDateTime,
+    @Transient
+    @get:JvmName("getIsNewRecord")
+    private val isNewRecord: Boolean = false
+) : Persistable<Long> {
+
+    override fun getId(): Long = id
+
+    override fun isNew(): Boolean = isNewRecord
+
+}
