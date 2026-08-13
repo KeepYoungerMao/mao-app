@@ -17,6 +17,7 @@ class AuthService(
     private val passwordHandler: PasswordHandler,
     private val jwtService: JwtService,
     private val jwtConfig: JwtConfig,
+    private val userService: UserService,
     private val systemService: SystemService
 ) {
 
@@ -28,7 +29,7 @@ class AuthService(
         // 提取出真正的明文密码
         val rawPassword = passwordHandler.decryptPassword(request.password, request.timestamp)
         // 创建token
-        return createToken(username, rawPassword)
+        return createToken(username, rawPassword, false)
     }
 
     suspend fun refreshToken(request: RefreshRequest): TokenResponse {
@@ -37,14 +38,14 @@ class AuthService(
         if (claims.getStringClaim("type") != "refresh") {
             throw AppException(ErrorCode.INVALID_TOKEN)
         }
-        return createToken(claims.subject)
+        return createToken(claims.subject, null, true)
     }
 
     /**
      * ## 创建token
      * 登录创建token与刷新token逻辑一致，都需要获取一遍用户信息
      */
-    private suspend fun createToken(username: String, password: String? = null): TokenResponse {
+    private suspend fun createToken(username: String, password: String? = null, refresh: Boolean): TokenResponse {
         // 获取用户信息，并转为AuthUserDetails
         val userDetails = userDetailsService.findByUsername(username).awaitSingleOrNull()
             ?: throw AppException(ErrorCode.USER_NOT_FOUND)
@@ -60,8 +61,21 @@ class AuthService(
         if (!authUserDetails.isAccountNonLocked) {
             throw AppException(ErrorCode.USER_LOCKED)
         }
-        if (authUserDetails.mustChangePassword) {
-            throw AppException(ErrorCode.UNCHANGE_PASSWORD)
+        // 密码状态，0：正常，1：首次需要更改密码，2：密码已更改，3：密码已重置
+        // 当首次注册未更改密码、用户密码更改、密码重置后，后台会将passwordStatus设置为非0特殊状态，
+        // 此时通过刷新token来获取token不能通过，必须通过创建token来获取
+        // 当用户通过创建token方式登录成功后，如果passwordStatus状态不为0，将更新password为0
+        // 后续用户可以正常通过refresh方式获取token
+        if (refresh) {
+            when (authUserDetails.passwordStatus) {
+                PasswordStatus.PASSWORD_UNCHANGE.code -> throw AppException(ErrorCode.UNCHANGE_PASSWORD)
+                PasswordStatus.PASSWORD_EDIT.code -> throw AppException(ErrorCode.PASSWORD_EDIT)
+                PasswordStatus.PASSWORD_RESET.code -> throw AppException(ErrorCode.PASSWORD_RESET)
+            }
+        } else {
+            if (authUserDetails.passwordStatus != PasswordStatus.OK.code) {
+                userService.resetUserPasswordStatus(authUserDetails.id)
+            }
         }
 
         // 密码校验

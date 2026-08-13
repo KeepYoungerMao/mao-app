@@ -114,6 +114,7 @@ CREATE TABLE `sys_user`
     `locked` TINYINT DEFAULT 0 COMMENT '是否锁定',
     `expire_time` DATETIME(3) COMMENT '过期时间',
     `last_login_time` DATETIME(3) COMMENT '上次登陆时间',
+    `password_status` INT COMMENT '密码状态，0：正常，1：首次需要更改密码，2：密码已更改，3：密码已重置',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
     `create_time` DATETIME(3) COMMENT '创建时间',

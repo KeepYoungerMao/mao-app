@@ -19,12 +19,14 @@ enum class ErrorCode(val code: Int, val message: String) {
     USER_EXPIRED(4105, "账户已到期"),
     USER_LOCKED(4106, "账户已锁定"),
     USER_DISABLED(4107, "账户已停用"),
-    UNCHANGE_PASSWORD(4108, "请前往修改密码再进行登录"),
-    MISS_TOKEN(4108, "认证信息缺失"),
-    BAD_TOKEN(4109, "认证信息格式不正确"),
-    INVALID_TOKEN(4110, "认证信息无效"),
-    TOKEN_EXPIRED(4111, "认证已到期，请重新认证"),
-    BAD_AUTHENTICATION_REQUEST(4112, "认证请求信息错误"),
+    UNCHANGE_PASSWORD(4108, "首次注册请前往修改密码再进行登录"),
+    PASSWORD_EDIT(4109, "密码已更改，请重新登录"),
+    PASSWORD_RESET(4110, "密码已重置，请重新登陆"),
+    MISS_TOKEN(4111, "认证信息缺失"),
+    BAD_TOKEN(4112, "认证信息格式不正确"),
+    INVALID_TOKEN(4113, "认证信息无效"),
+    TOKEN_EXPIRED(4114, "认证已到期，请重新认证"),
+    BAD_AUTHENTICATION_REQUEST(4115, "认证请求信息错误"),
 
     // 授权异常
     AUTHORIZATION_ERROR(4301, "授权错误，请联系管理员"),
@@ -101,4 +103,18 @@ enum class Operation {
 
     UNSET,
 
+}
+
+/**
+ * ## 系统用户密码状态
+ * - OK：正常状态
+ * - PASSWORD_UNCHANGE：用户首次注册后，还未更改密码
+ * - PASSWORD_EDIT：用户更改了密码
+ * - PASSWORD_RESET：用户密码被重置
+ */
+enum class PasswordStatus(val code: Int) {
+    OK(0),
+    PASSWORD_UNCHANGE(1),
+    PASSWORD_EDIT(2),
+    PASSWORD_RESET(3),
 }

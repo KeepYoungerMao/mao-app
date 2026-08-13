@@ -7,6 +7,7 @@ import java.io.Serializable
 
 /**
  * 实现spring security的UserDetails的用户数据
+ * passwordStatus: 密码状态，0：正常，1：首次需要更改密码，2：密码已更改，3：密码已重置
  */
 data class AuthUserDetails(
     val id: Int,
@@ -15,7 +16,7 @@ data class AuthUserDetails(
     private val expired: Boolean,
     private val locked: Boolean,
     private val enabled: Boolean,
-    val mustChangePassword: Boolean,
+    val passwordStatus: Int,
     private val authorities: Collection<GrantedAuthority>
 ): UserDetails, Serializable {
 
@@ -28,7 +29,7 @@ data class AuthUserDetails(
                 expired = userDo.expired ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 locked = userDo.locked ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 enabled = userDo.enabled ?: throw AppException(ErrorCode.USER_NOT_FOUND),
-                mustChangePassword = userDo.mustChangePassword ?: throw AppException(ErrorCode.USER_NOT_FOUND),
+                passwordStatus = userDo.passwordStatus ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 authorities = authorities,
             )
         }

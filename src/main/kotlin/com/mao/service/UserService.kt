@@ -53,7 +53,7 @@ class UserService(
             this.enabled = true
             this.locked = false
             this.expired = false
-            this.mustChangePassword = true
+            this.passwordStatus = PasswordStatus.PASSWORD_UNCHANGE.code
         }
         // 保存用户数据
         val savedUser: UserDo = userRepository.save(userDo)
@@ -87,8 +87,8 @@ class UserService(
             throw AppException(ErrorCode.PASSWORD_ERROR)
         }
         user.password = passwordEncoder.encode(newPassword)
-        // 更新是否需要更改密码为false
-        user.mustChangePassword = false
+        // 更新密码状态为2：密码已更新
+        user.passwordStatus = PasswordStatus.PASSWORD_EDIT.code
         userRepository.save(user)
         // 发布密码变更事件
         eventPublisher.publishEvent(UserStatusUpdateEvent(username, UserStatusUpdateType.PASSWORD_EDIT))
@@ -100,6 +100,8 @@ class UserService(
         val user = userRepository.findByUsername(username) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
         val newPassword = passwordHandler.generatePassword()
         user.password = passwordEncoder.encode(newPassword)
+        // 更新密码状态为3：密码已重置
+        user.passwordStatus = PasswordStatus.PASSWORD_RESET.code
         userRepository.save(user)
         // 发布密码重置事件，用于邮箱通知
         eventPublisher.publishEvent(UserPasswordResetEvent(user.email!!, newPassword))
@@ -199,6 +201,17 @@ class UserService(
         // 发布角色删除事件
         eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.DELETED))
         return Tips("数据删除成功")
+    }
+
+    /**
+     * 重置密码状态为正常状态
+     * 该方法用于，密码状态特殊时（1：首次创建用户时密码为更改，2：密码已变更，3：密码已重置），不允许使用刷新token的方式登录，
+     * 等用户使用创建token方式登录成功后，调用此方法，将特殊密码状态更新为正常状态 0
+     */
+    suspend fun resetUserPasswordStatus(userId: Int) {
+        val user = userRepository.findByIdOrThrow(userId)
+        user.passwordStatus = PasswordStatus.OK.code
+        userRepository.save(user)
     }
 
 }

@@ -35,7 +35,7 @@ data class UserDo(
     var enabled: Boolean? = null,
     var expireTime: LocalDateTime? = null,
     var lastLoginTime: LocalDateTime? = null,
-    var mustChangePassword: Boolean? = null,
+    var passwordStatus: Int? = null,
 ) : BaseDo()
 
 @Table("sys_user_role_ref")

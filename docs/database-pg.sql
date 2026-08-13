@@ -163,6 +163,7 @@ CREATE TABLE sys_user (
     locked BOOLEAN DEFAULT FALSE,
     expire_time TIMESTAMP(3),
     last_login_time TIMESTAMP(3),
+    password_status INT NOT NULL DEFAULT 0,
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
@@ -180,6 +181,7 @@ COMMENT ON COLUMN sys_user.expired IS '是否过期（true=已过期，false=未
 COMMENT ON COLUMN sys_user.locked IS '是否锁定（true=已锁定，false=未锁定）';
 COMMENT ON COLUMN sys_user.expire_time IS '过期时间';
 COMMENT ON COLUMN sys_user.last_login_time IS '上次登陆时间';
+COMMENT ON COLUMN sys_user.password_status IS '密码状态，0：正常，1：首次需要更改密码，2：密码已更改，3：密码已重置'
 COMMENT ON COLUMN sys_user.creator IS '创建用户';
 COMMENT ON COLUMN sys_user.create_time IS '创建时间';
 COMMENT ON COLUMN sys_user.updater IS '更新用户';
