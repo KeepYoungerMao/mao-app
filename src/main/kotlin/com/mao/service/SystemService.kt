@@ -2,7 +2,7 @@ package com.mao.service
 
 import com.mao.entity.ServerInfo
 import com.mao.extension.MinuteServerMetricBucket
-import com.mao.extension.UserRolePermissionCache
+import com.mao.extension.UserAuthCache
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.info.BuildProperties
 import org.springframework.stereotype.Service
@@ -20,7 +20,7 @@ class SystemService(
     @Value("\${spring.application.name}")
     private val serverName: String,
     private val buildProperties: BuildProperties,
-    private val userRolePermissionCache: UserRolePermissionCache
+    private val userAuthCache: UserAuthCache
 ) {
 
     /**
@@ -110,7 +110,7 @@ class SystemService(
             successResponse = successRequests.get(),
             errorResponse = errorRequests.get(),
             avgResponse = averageResponse,
-            onlineUsers = userRolePermissionCache.getTotal(),
+            onlineUsers = userAuthCache.getTotal(),
             loginUsers = todayLoginUsers.size,
         )
     }
@@ -120,7 +120,7 @@ class SystemService(
      * UserRolePermission类缓存了获取token用户的角色和权限信息，
      * 通过获取缓存的个数，可以大体反应当前在线人数，误差30分钟（取决于token有效期）
      */
-    fun getCurrentOnlineUser(): Int = userRolePermissionCache.getTotal()
+    fun getCurrentOnlineUser(): Int = userAuthCache.getTotal()
 
     /**
      * ## 转换桶

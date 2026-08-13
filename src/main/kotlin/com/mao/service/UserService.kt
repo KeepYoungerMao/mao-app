@@ -5,6 +5,8 @@ import com.mao.ex.AppException
 import com.mao.extension.PasswordHandler
 import com.mao.listener.UserCreateEvent
 import com.mao.listener.UserPasswordResetEvent
+import com.mao.listener.UserStatusUpdateEvent
+import com.mao.listener.UserStatusUpdateType
 import com.mao.mapper.UserMapper
 import com.mao.mapper.UserProfileMapper
 import com.mao.repository.UserProfileRepository
@@ -88,6 +90,8 @@ class UserService(
         // 更新是否需要更改密码为false
         user.mustChangePassword = false
         userRepository.save(user)
+        // 发布密码变更事件
+        eventPublisher.publishEvent(UserStatusUpdateEvent(username, UserStatusUpdateType.PASSWORD_EDIT))
         return Tips("更新密码成功，请重新登陆")
     }
 
@@ -97,7 +101,10 @@ class UserService(
         val newPassword = passwordHandler.generatePassword()
         user.password = passwordEncoder.encode(newPassword)
         userRepository.save(user)
+        // 发布密码重置事件，用于邮箱通知
         eventPublisher.publishEvent(UserPasswordResetEvent(user.email!!, newPassword))
+        // 发布密码重置事件，用于认证
+        eventPublisher.publishEvent(UserStatusUpdateEvent(username, UserStatusUpdateType.PASSWORD_RESET))
         return Tips("密码重置成功")
     }
 
@@ -118,6 +125,8 @@ class UserService(
         val user = userRepository.findByIdOrThrow(id)
         user.locked = true
         userRepository.save(user)
+        // 发布用户锁定事件
+        eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.LOCKED))
         return userMapper.toVo(user)
     }
 
@@ -139,6 +148,8 @@ class UserService(
         val user = userRepository.findByIdOrThrow(id)
         user.enabled = false
         userRepository.save(user)
+        // 发布用户禁用事件
+        eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.DISABLED))
         return userMapper.toVo(user)
     }
 
@@ -157,6 +168,8 @@ class UserService(
         val userRoleRefs = roleIds.map { UserRoleRefDo(id = null, userId = user.id!!, roleId = it) }
         val refs = userRoleRefRepository.saveAll(userRoleRefs)
         log.info("user: [{}] operate: add new user [{}] role ref [count: {}]", operateUser, user.username, refs.count())
+        // 发布角色改变事件
+        eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.ROLES_EDIT))
         return Tips("角色更新成功")
     }
 
@@ -183,6 +196,8 @@ class UserService(
         val count1 = userRoleRefRepository.deleteByUserId(user.id!!)
         log.info("user: [{}] operate: delete user [{}] role ref [count: {}]", operateUser, user.username, count1)
         // TODO delete user_profile_*
+        // 发布角色删除事件
+        eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.DELETED))
         return Tips("数据删除成功")
     }
 

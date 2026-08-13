@@ -1,20 +1,22 @@
 package com.mao.config
 
+import com.mao.entity.ErrorCode
 import com.mao.extension.CustomAuthHandler
-import com.mao.extension.RolePermissionData
-import com.mao.extension.UserRolePermissionCache
+import com.mao.extension.UserAuthCache
+import com.mao.extension.UserAuthCacheData
 import com.mao.util.RsaUtils
 import com.nimbusds.jose.jwk.RSAKey
 import kotlinx.coroutines.reactor.mono
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AccountExpiredException
+import org.springframework.security.authentication.DisabledException
+import org.springframework.security.authentication.LockedException
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.config.web.server.invoke
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
@@ -80,17 +82,17 @@ class SecurityConfiguration(
      * 我们要存储自定义权限不会进行解析
      */
     @Bean
-    fun reactiveJwtAuthenticationConverter(userRolePermissionCache: UserRolePermissionCache): ReactiveJwtAuthenticationConverter {
+    fun reactiveJwtAuthenticationConverter(userAuthCache: UserAuthCache): ReactiveJwtAuthenticationConverter {
         val converter = ReactiveJwtAuthenticationConverter()
         // 根据username实时查询权限信息
         converter.setJwtGrantedAuthoritiesConverter { jwt ->
             mono {
-                userRolePermissionCache.get(jwt.subject) ?: RolePermissionData("", emptyList(), emptyList())
-            }.flatMapMany { permissionData ->
-                val authorities = mutableSetOf<GrantedAuthority>()
-                permissionData.roles.forEach { authorities.add(SimpleGrantedAuthority("ROLE_$it")) }
-                permissionData.permissions.forEach { authorities.add(SimpleGrantedAuthority(it)) }
-                Flux.fromIterable(authorities)
+                userAuthCache.get(jwt.subject) ?: UserAuthCacheData.empty()
+            }.flatMapMany { authCacheData ->
+                if (!authCacheData.enabled) throw DisabledException(ErrorCode.USER_DISABLED.message)
+                if (authCacheData.expired) throw AccountExpiredException(ErrorCode.USER_EXPIRED.message)
+                if (authCacheData.locked) throw LockedException(ErrorCode.USER_LOCKED.message)
+                Flux.fromIterable(authCacheData.authorities)
             }
         }
         return converter

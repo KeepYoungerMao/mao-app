@@ -52,7 +52,7 @@ class AuthService(
 
         // 账号状态校验
         if (!authUserDetails.isEnabled) {
-            throw AppException(ErrorCode.USER_UNENABLED)
+            throw AppException(ErrorCode.USER_DISABLED)
         }
         if (!authUserDetails.isAccountNonExpired) {
             throw AppException(ErrorCode.USER_EXPIRED)
@@ -66,7 +66,7 @@ class AuthService(
 
         // 密码校验
         if (password != null) {
-            if (!passwordEncoder.matches(password, userDetails.password)) {
+            if (!passwordEncoder.matches(password, authUserDetails.password)) {
                 throw AppException(ErrorCode.PASSWORD_ERROR)
             }
         }

@@ -86,6 +86,9 @@ class CustomAuthHandler(
     override fun commence(exchange: ServerWebExchange, ex: AuthenticationException): Mono<Void> {
         log.error("authentication exception: {}", ex.javaClass.name)
         val errorCode = when (ex) {
+            is DisabledException -> ErrorCode.USER_DISABLED
+            is AccountExpiredException -> ErrorCode.USER_EXPIRED
+            is LockedException -> ErrorCode.USER_LOCKED
             is AuthenticationServiceException -> ErrorCode.AUTHENTICATION_ERROR
             is AuthenticationCredentialsNotFoundException -> ErrorCode.MISS_TOKEN
             is InsufficientAuthenticationException -> ErrorCode.MISS_TOKEN

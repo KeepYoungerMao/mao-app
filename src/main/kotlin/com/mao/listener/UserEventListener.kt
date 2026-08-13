@@ -1,5 +1,6 @@
 package com.mao.listener
 
+import com.mao.extension.UserAuthCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 class UserEventListener(
     private val mailSender: JavaMailSender,
     @Value("\${spring.mail.username}") val fromEmail: String,
+    private val userAuthCache: UserAuthCache
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -48,6 +50,27 @@ class UserEventListener(
                 mailSender.send(message)
             }.onFailure { e ->
                 log.error("Exception occurred while handling user password reset: ", e)
+            }
+        }
+    }
+
+    @EventListener
+    fun handleUserStatusUpdateEvent(event: UserStatusUpdateEvent) {
+        CoroutineScope(Dispatchers.IO).launch {
+            runCatching {
+                log.info("用户状态已改变：{}", event.status)
+                // 目前所有用户状态更新事件都需要清楚权限数据缓存
+                when (event.status) {
+                    UserStatusUpdateType.DISABLED,
+                    UserStatusUpdateType.LOCKED,
+                    UserStatusUpdateType.EXPIRED,
+                    UserStatusUpdateType.PASSWORD_EDIT,
+                    UserStatusUpdateType.PASSWORD_RESET,
+                    UserStatusUpdateType.ROLES_EDIT,
+                    UserStatusUpdateType.DELETED -> {
+                        userAuthCache.evict(event.username)
+                    }
+                }
             }
         }
     }

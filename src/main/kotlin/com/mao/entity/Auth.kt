@@ -20,7 +20,7 @@ data class AuthUserDetails(
 ): UserDetails, Serializable {
 
     companion object {
-        fun create(userDo: UserDo): AuthUserDetails {
+        fun create(userDo: UserDo, authorities: Collection<GrantedAuthority>): AuthUserDetails {
             return AuthUserDetails(
                 id = userDo.id ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 username = userDo.username ?: throw AppException(ErrorCode.USER_NOT_FOUND),
@@ -29,7 +29,7 @@ data class AuthUserDetails(
                 locked = userDo.locked ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 enabled = userDo.enabled ?: throw AppException(ErrorCode.USER_NOT_FOUND),
                 mustChangePassword = userDo.mustChangePassword ?: throw AppException(ErrorCode.USER_NOT_FOUND),
-                authorities = emptySet(),
+                authorities = authorities,
             )
         }
     }

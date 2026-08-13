@@ -18,7 +18,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     PASSWORD_ERROR(4104, "用户或密码错误"),
     USER_EXPIRED(4105, "账户已到期"),
     USER_LOCKED(4106, "账户已锁定"),
-    USER_UNENABLED(4107, "账户已停用"),
+    USER_DISABLED(4107, "账户已停用"),
     UNCHANGE_PASSWORD(4108, "请前往修改密码再进行登录"),
     MISS_TOKEN(4108, "认证信息缺失"),
     BAD_TOKEN(4109, "认证信息格式不正确"),

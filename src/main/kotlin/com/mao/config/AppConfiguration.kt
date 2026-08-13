@@ -1,9 +1,8 @@
 package com.mao.config
 
-import com.mao.extension.CaffeineUserRolePermissionCache
+import com.mao.extension.CaffeineUserAuthCache
 import com.mao.extension.GlobalResponseResultHandler
-import com.mao.extension.UserRolePermissionCache
-import com.mao.service.RoleService
+import com.mao.extension.UserAuthCache
 import io.micrometer.context.ContextRegistry
 import jakarta.annotation.PostConstruct
 import org.slf4j.MDC
@@ -17,6 +16,7 @@ import org.springframework.data.domain.ReactiveAuditorAware
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
 import org.springframework.http.codec.ServerCodecConfigurer
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver
 import reactor.core.publisher.Hooks
@@ -129,8 +129,8 @@ class AppConfiguration {
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.ReactiveRedisConnectionFactory")
     @ConditionalOnClass(name = ["com.github.benmanes.caffeine.cache.Caffeine"])
     fun localUserPermissionCache(jwtConfig: JwtConfig,
-                                 roleService: RoleService) : UserRolePermissionCache {
-        return CaffeineUserRolePermissionCache(jwtConfig, roleService)
+                                 reactiveUserDetailsService: ReactiveUserDetailsService) : UserAuthCache {
+        return CaffeineUserAuthCache(jwtConfig, reactiveUserDetailsService)
     }
 
     /**
