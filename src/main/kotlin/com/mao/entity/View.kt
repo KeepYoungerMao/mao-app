@@ -36,6 +36,30 @@ data class UserVo(
     val lastLoginTime: LocalDateTime? = null
 ) : BaseVo()
 
+/**
+ * 用户详情
+ */
+data class UserDetailVo(
+    val user: UserVo,
+    val profile: UserProfileVo,
+    val roles: List<RoleVo>,
+    val departments: List<DepartmentVo>,
+)
+
+data class RoleVo(
+    val id: Int? = null,
+    val name: String? = null,
+    val description: String? = null,
+) : BaseVo()
+
+data class DepartmentVo(
+    val id: Int? = null,
+    val pid: Int? = null,
+    val companyId: Int? = null,
+    val departmentName: String? = null,
+    val description: String? = null,
+) : BaseVo()
+
 data class UserProfileVo(
     val id: Int? = null,
     val userId: Int? = null,

@@ -13,6 +13,17 @@ import org.springframework.stereotype.Repository
 interface UserRoleRefRepository: CoroutineCrudRepository<UserRoleRefDo, Int> {
 
     /**
+     * 根据用户id查询关联的角色列表
+     */
+    @Query("""
+    select r.*
+    from sys_user_role_ref as ur
+    inner join sys_role as r on ur.role_id = r.id
+    where ur.user_id = :userId
+    """)
+    fun getRoleByUserId(@Param("userId") userId: Int): Flow<RoleDo>
+
+    /**
      * 根据角色id查询与该角色相关联的用户名
      */
     @Query("""

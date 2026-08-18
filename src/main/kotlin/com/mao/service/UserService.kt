@@ -7,13 +7,20 @@ import com.mao.listener.UserCreateEvent
 import com.mao.listener.UserPasswordResetEvent
 import com.mao.listener.UserStatusUpdateEvent
 import com.mao.listener.UserStatusUpdateType
+import com.mao.mapper.DepartmentMapper
+import com.mao.mapper.RoleMapper
 import com.mao.mapper.UserMapper
 import com.mao.mapper.UserProfileMapper
+import com.mao.repository.UserDepartmentRefRepository
 import com.mao.repository.UserProfileRepository
 import com.mao.repository.UserRepository
 import com.mao.repository.UserRoleRefRepository
 import com.mao.util.currentUser
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -29,18 +36,81 @@ class UserService(
     private val passwordHandler: PasswordHandler,
     private val eventPublisher: ApplicationEventPublisher,
     private val userRoleRefRepository: UserRoleRefRepository,
+    private val userDepartmentRefRepository: UserDepartmentRefRepository,
     private val userProfileRepository: UserProfileRepository,
-    private val userProfileMapper: UserProfileMapper
+    private val userProfileMapper: UserProfileMapper,
+    private val roleMapper: RoleMapper,
+    private val departmentMapper: DepartmentMapper,
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    suspend fun searchUsers(request: UserQo): PageResponse<UserVo> {
-        return userRepository.page(request).map { userMapper.toVo(it) }
+    suspend fun searchUsers(request: UserQo): PageResponse<UserVo> = coroutineScope {
+        val recordsDeferred = async {
+            userRepository.searchUsers(
+                username = request.username,
+                phone = request.phone,
+                email = request.email,
+                expired = request.expired,
+                locked = request.locked,
+                enabled = request.enabled,
+                roleId = request.roleId,
+                departmentId = request.departmentId,
+                pageSize = request.pageSize,
+                offset = request.offset(),
+            ).toList()
+        }
+        val countDeferred = async {
+            val currentHitCount = request.lastHitCount
+            if (request.recount || currentHitCount == null || currentHitCount < 0) {
+                userRepository.countUsers(
+                    username = request.username,
+                    phone = request.phone,
+                    email = request.email,
+                    expired = request.expired,
+                    locked = request.locked,
+                    enabled = request.enabled,
+                    roleId = request.roleId,
+                    departmentId = request.departmentId,
+                )
+            } else {
+                currentHitCount
+            }
+        }
+        PageResponse(
+            pageNum = request.pageNum,
+            pageSize = request.pageSize,
+            total = countDeferred.await(),
+            records = recordsDeferred.await(),
+        ).map { userMapper.toVo(it) }
     }
 
-    suspend fun searchUser(id: Int?): UserVo {
-        return userRepository.findByIdOrThrow(id).let { userMapper.toVo(it) }
+    suspend fun searchUser(id: Int?): UserDetailVo {
+        val user = userRepository.findByIdOrThrow(id)
+        val userId = user.id!!
+        return coroutineScope {
+            val profileDeferred = async {
+                userProfileRepository.findByUserId(userId)
+                    ?.let(userProfileMapper::toVo)
+                    ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+            }
+            val rolesDeferred = async {
+                userRoleRefRepository.getRoleByUserId(userId)
+                    .map(roleMapper::toVo)
+                    .toList()
+            }
+            val departmentsDeferred = async {
+                userDepartmentRefRepository.getDepartmentByUserId(userId)
+                    .map(departmentMapper::toVo)
+                    .toList()
+            }
+            UserDetailVo(
+                user = userMapper.toVo(user),
+                profile = profileDeferred.await(),
+                roles = rolesDeferred.await(),
+                departments = departmentsDeferred.await(),
+            )
+        }
     }
 
     @Transactional

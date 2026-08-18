@@ -21,7 +21,8 @@ class PasswordHandler(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val allowedChars: Set<Char> = RandomUtils.RANDOM_CODE.map { it.toInt().and(0xFF).toChar() }.toSet()
+    // 用户设置密码时允许完整英文字母；生成密码时则排除易混淆字符。
+    private val allowedPasswordChars = ALL_ALLOWED_PASSWORD_CHARS.toSet()
 
     suspend fun decryptPassword(password: String?, timestamp: Long?): String {
         if (password == null) {
@@ -65,8 +66,56 @@ class PasswordHandler(
         }
     }
 
-    suspend fun generatePassword(): String = RandomUtils.pass(16)
+    suspend fun generatePassword(): String {
+        // 先从四类字符中各取一个，保证生成结果必然满足最高复杂度要求。
+        val password = buildString(GENERATED_PASSWORD_LENGTH) {
+            append(RandomUtils.randomString(1, SPECIAL_CHARS))
+            append(RandomUtils.randomString(1, DIGITS))
+            append(RandomUtils.randomString(1, GENERATED_UPPERCASE_CHARS))
+            append(RandomUtils.randomString(1, GENERATED_LOWERCASE_CHARS))
+            // 剩余位置从完整生成字符集中随机补齐，避免各类字符数量固定。
+            append(
+                RandomUtils.randomString(
+                    GENERATED_PASSWORD_LENGTH - PASSWORD_CATEGORY_COUNT,
+                    ALL_GENERATED_PASSWORD_CHARS,
+                )
+            )
+        }.toCharArray()
+        // 打乱预先放入的四类字符，避免密码前四位形成可预测模式。
+        return RandomUtils.shuffle(password).concatToString()
+    }
 
-    suspend fun isLegalPassword(password: String): Boolean = password.all { it in allowedChars }
+    suspend fun isLegalPassword(password: String): Boolean {
+        // 先拒绝长度越界和字符集之外的内容，再统计密码覆盖的字符类别。
+        return password.length in MIN_PASSWORD_LENGTH..MAX_PASSWORD_LENGTH &&
+            password.all { it in allowedPasswordChars } &&
+            listOf(
+            password.any { it in SPECIAL_CHARS },
+            password.any { it in DIGITS },
+            password.any { it in ALLOWED_UPPERCASE_CHARS },
+            password.any { it in ALLOWED_LOWERCASE_CHARS },
+            ).count { it } >= MIN_PASSWORD_CATEGORY_COUNT
+    }
+
+    private companion object {
+        const val GENERATED_PASSWORD_LENGTH = 16
+        const val MIN_PASSWORD_LENGTH = 8
+        const val MAX_PASSWORD_LENGTH = 64
+        const val PASSWORD_CATEGORY_COUNT = 4
+        const val MIN_PASSWORD_CATEGORY_COUNT = 3
+
+        const val SPECIAL_CHARS = ".@#$%^&*_?!~"
+        const val DIGITS = "0123456789"
+        // 生成密码时排除 I、L、O、U 及对应小写字符，减少人工识别错误。
+        const val GENERATED_UPPERCASE_CHARS = "ABCDEFGHJKMNPQRSTVWXYZ"
+        const val GENERATED_LOWERCASE_CHARS = "abcdefghjkmnpqrstvwxyz"
+        // 用户自行设置密码时不排除上述字母，避免无必要地限制合法输入。
+        const val ALLOWED_UPPERCASE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        const val ALLOWED_LOWERCASE_CHARS = "abcdefghijklmnopqrstuvwxyz"
+        const val ALL_GENERATED_PASSWORD_CHARS =
+            SPECIAL_CHARS + DIGITS + GENERATED_UPPERCASE_CHARS + GENERATED_LOWERCASE_CHARS
+        const val ALL_ALLOWED_PASSWORD_CHARS =
+            SPECIAL_CHARS + DIGITS + ALLOWED_UPPERCASE_CHARS + ALLOWED_LOWERCASE_CHARS
+    }
 
 }

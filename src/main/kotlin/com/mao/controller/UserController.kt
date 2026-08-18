@@ -22,7 +22,7 @@ class UserController(
 
     @PostMapping("detail")
     @OperationLog(operation = Operation.DETAIL)
-    suspend fun searchUser(@Valid @RequestBody request: IdQo<Int>): UserVo = userService.searchUser(request.id)
+    suspend fun searchUser(@Valid @RequestBody request: IdQo<Int>): UserDetailVo = userService.searchUser(request.id)
 
     @PostMapping("create")
     @OperationLog(operation = Operation.CREATE)

@@ -65,6 +65,25 @@ data class RolePermissionRefDo(
     val permissionId: Int
 )
 
+@Table("sys_department")
+data class DepartmentDo(
+    @Id
+    var id: Int? = null,
+    var pid: Int? = null,
+    var companyId: Int? = null,
+    var departmentName: String? = null,
+    var description: String? = null,
+) : BaseDo()
+
+@Table("sys_user_department_ref")
+data class UserDepartmentRefDo(
+    @Id
+    val id: Int?,
+    val userId: Int,
+    val companyId: Int,
+    val departmentId: Int,
+)
+
 @Table("sys_user_profile")
 data class UserProfileDo(
     @Id
