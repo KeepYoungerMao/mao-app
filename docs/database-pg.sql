@@ -454,93 +454,31 @@ COMMENT ON COLUMN sys_user_profile_material.updater IS '更新用户';
 COMMENT ON COLUMN sys_user_profile_material.update_time IS '更新时间';
 CREATE INDEX idx_user_material_user_id ON sys_user_profile_material (user_id);
 
--- 公司表
--- 公司类型：国有企业、私营企业、外资企业、合资企业
--- 所属行业：
--- 经营状况：正常运营、停业、注销
--- 公司表
+-- 清理旧版多公司表
 DROP TABLE IF EXISTS sys_company;
-CREATE TABLE sys_company (
-    id SERIAL PRIMARY KEY,
-    company_code VARCHAR(100) NOT NULL,
-    company_name VARCHAR(100) NOT NULL,
-    unified_social_credit_code VARCHAR(18),
-    company_type_id INTEGER,
-    legal_representative VARCHAR(100),
-    founded_date DATE,
-    registered_capital VARCHAR(50),
-    business_scope VARCHAR(500),
-    registered_address VARCHAR(300),
-    business_address VARCHAR(300),
-    phone VARCHAR(50),
-    email VARCHAR(50),
-    official_website VARCHAR(100),
-    enterprise_size VARCHAR(100),
-    industry_id INTEGER,
-    tax_registration_certificate_no VARCHAR(18),
-    deposit_bank_and_account VARCHAR(200),
-    business_condition_id INTEGER,
-    description TEXT,
-    company_logo_filepath VARCHAR(300),
-    creator VARCHAR(20),
-    create_time TIMESTAMP(3),
-    updater VARCHAR(20),
-    update_time TIMESTAMP(3),
-    CONSTRAINT uk_company_name UNIQUE (company_name),
-    CONSTRAINT uk_company_unified_social_credit_code UNIQUE (unified_social_credit_code)
-);
-COMMENT ON TABLE sys_company IS '公司表';
-COMMENT ON COLUMN sys_company.id IS '主键';
-COMMENT ON COLUMN sys_company.company_code IS '公司编号';
-COMMENT ON COLUMN sys_company.company_name IS '公司名称';
-COMMENT ON COLUMN sys_company.unified_social_credit_code IS '统一社会信用代码/注册号';
-COMMENT ON COLUMN sys_company.company_type_id IS '公司类型id（关联字典表）';
-COMMENT ON COLUMN sys_company.legal_representative IS '法定代表人';
-COMMENT ON COLUMN sys_company.founded_date IS '成立日期';
-COMMENT ON COLUMN sys_company.registered_capital IS '注册资本';
-COMMENT ON COLUMN sys_company.business_scope IS '经营范围';
-COMMENT ON COLUMN sys_company.registered_address IS '注册地址';
-COMMENT ON COLUMN sys_company.business_address IS '办公地址';
-COMMENT ON COLUMN sys_company.phone IS '联系电话/传真';
-COMMENT ON COLUMN sys_company.email IS '邮箱';
-COMMENT ON COLUMN sys_company.official_website IS '官方网站';
-COMMENT ON COLUMN sys_company.enterprise_size IS '企业规模';
-COMMENT ON COLUMN sys_company.industry_id IS '所属行业id（关联sys_industry_2017表）';
-COMMENT ON COLUMN sys_company.tax_registration_certificate_no IS '税务登记证号';
-COMMENT ON COLUMN sys_company.deposit_bank_and_account IS '开户行及帐号';
-COMMENT ON COLUMN sys_company.business_condition_id IS '经营状态id（关联字典表）';
-COMMENT ON COLUMN sys_company.description IS '公司简介';
-COMMENT ON COLUMN sys_company.company_logo_filepath IS '公司logo文件地址';
-COMMENT ON COLUMN sys_company.creator IS '创建用户';
-COMMENT ON COLUMN sys_company.create_time IS '创建时间';
-COMMENT ON COLUMN sys_company.updater IS '更新用户';
-COMMENT ON COLUMN sys_company.update_time IS '更新时间';
 
 -- 部门表
 DROP TABLE IF EXISTS sys_department;
 CREATE TABLE sys_department (
     id SERIAL PRIMARY KEY,
     pid INTEGER NOT NULL,
-    company_id INTEGER NOT NULL,
     department_name VARCHAR(100) NOT NULL,
     description VARCHAR(300),
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
     update_time TIMESTAMP(3),
-    CONSTRAINT uk_department_company_name UNIQUE (company_id, department_name)
+    CONSTRAINT uk_department_name UNIQUE (department_name)
 );
 COMMENT ON TABLE sys_department IS '部门表';
 COMMENT ON COLUMN sys_department.id IS '主键';
 COMMENT ON COLUMN sys_department.pid IS '父类id';
-COMMENT ON COLUMN sys_department.company_id IS '所属公司id';
 COMMENT ON COLUMN sys_department.department_name IS '部门名称';
 COMMENT ON COLUMN sys_department.description IS '描述';
 COMMENT ON COLUMN sys_department.creator IS '创建用户';
 COMMENT ON COLUMN sys_department.create_time IS '创建时间';
 COMMENT ON COLUMN sys_department.updater IS '更新用户';
 COMMENT ON COLUMN sys_department.update_time IS '更新时间';
-CREATE INDEX idx_department_company_id ON sys_department (company_id);
 CREATE INDEX idx_department_pid ON sys_department (pid);
 
 -- 用户-部门关系表
@@ -548,13 +486,11 @@ DROP TABLE IF EXISTS sys_user_department_ref;
 CREATE TABLE sys_user_department_ref (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    company_id INTEGER NOT NULL,
     department_id INTEGER NOT NULL
 );
 COMMENT ON TABLE sys_user_department_ref IS '用户-部门关系表';
 COMMENT ON COLUMN sys_user_department_ref.id IS '主键';
 COMMENT ON COLUMN sys_user_department_ref.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_department_ref.company_id IS '公司id';
 COMMENT ON COLUMN sys_user_department_ref.department_id IS '部门id';
 
 

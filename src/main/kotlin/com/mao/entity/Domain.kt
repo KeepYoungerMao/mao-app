@@ -70,7 +70,6 @@ data class DepartmentDo(
     @Id
     var id: Int? = null,
     var pid: Int? = null,
-    var companyId: Int? = null,
     var departmentName: String? = null,
     var description: String? = null,
 ) : BaseDo()
@@ -80,7 +79,6 @@ data class UserDepartmentRefDo(
     @Id
     val id: Int?,
     val userId: Int,
-    val companyId: Int,
     val departmentId: Int,
 )
 

@@ -66,7 +66,6 @@ enum class OperationModule(val scope: OperationScope) {
     OPERATION_LOG(OperationScope.SYSTEM),
     DICT(OperationScope.SYSTEM),
     DEPARTMENT(OperationScope.SYSTEM),
-    COMPANY(OperationScope.SYSTEM),
 
     ANCIENT_BOOK(OperationScope.DATA),
     CHINESE_SURNAME(OperationScope.DATA),

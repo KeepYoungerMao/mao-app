@@ -55,7 +55,6 @@ data class RoleVo(
 data class DepartmentVo(
     val id: Int? = null,
     val pid: Int? = null,
-    val companyId: Int? = null,
     val departmentName: String? = null,
     val description: String? = null,
 ) : BaseVo()
@@ -89,7 +88,7 @@ data class UserProfileVo(
     val familyPhone: String? = null,
     val hobby: String? = null,
     val remark: String? = null
-) : BaseDo()
+) : BaseVo()
 
 /**
  * 系统操作日志

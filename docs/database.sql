@@ -302,41 +302,8 @@ CREATE TABLE `sys_user_profile_material`
     UNIQUE KEY(`user_id`, `material_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
--- 公司表
--- 公司类型：国有企业、私营企业、外资企业、合资企业
--- 所属行业：
--- 经营状况：正常运营、停业、注销
+-- 清理旧版多公司表
 DROP TABLE IF EXISTS `sys_company`;
-CREATE TABLE `sys_company`
-(
-    `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `company_code` VARCHAR(100) NOT NULL COMMENT '公司编号',
-    `company_name` VARCHAR(100) NOT NULL COMMENT '公司名称',
-    `unified_social_credit_code` VARCHAR(18) COMMENT '统一社会信用代码/注册号',
-    `company_type_id` INT COMMENT '公司类型id',
-    `legal_representative` VARCHAR(100) COMMENT '法定代表人',
-    `founded_date` DATE COMMENT '成立日期',
-    `registered_capital` VARCHAR(50) COMMENT '注册资本',
-    `business_scope` VARCHAR(500) COMMENT '经营范围',
-    `registered_address` VARCHAR(300) COMMENT '注册地址',
-    `business_address` VARCHAR(300) COMMENT '办公地址',
-    `phone` VARCHAR(50) COMMENT '联系电话/传真',
-    `email` VARCHAR(50) COMMENT '邮箱',
-    `official_website` VARCHAR(100) COMMENT '官方网站',
-    `enterprise_size` VARCHAR(100) COMMENT '企业规模',
-    `industry_id` INT COMMENT '所属行业id',
-    `tax_registration_certificate_no` VARCHAR(18) COMMENT '税务登记证号',
-    `deposit_bank_and_account` VARCHAR(200) COMMENT '开户行及帐号',
-    `business_condition_id` INT COMMENT '经营状态id',
-    `description` TEXT COMMENT '公司简介',
-    `company_logo_filepath` VARCHAR(300) COMMENT '公司logo文件地址',
-    `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
-    `creator` VARCHAR(20) COMMENT '创建用户',
-    `create_time` DATETIME(3) COMMENT '创建时间',
-    `updater` VARCHAR(20) COMMENT '更新用户',
-    `update_time` DATETIME(3) COMMENT '更新时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 部门表
 DROP TABLE IF EXISTS `sys_department`;
@@ -344,7 +311,6 @@ CREATE TABLE `sys_department`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `pid` INT NOT NULL COMMENT '父类id',
-    `company_id` INT NOT NULL COMMENT '所属公司id',
     `department_name` VARCHAR(100) NOT NULL COMMENT '部门名称',
     `description` VARCHAR(300) COMMENT '描述',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
@@ -353,7 +319,7 @@ CREATE TABLE `sys_department`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY (`company_id`, `department_name`)
+    UNIQUE KEY (`department_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 用户 - 部门关系表
@@ -362,7 +328,6 @@ CREATE TABLE `sys_user_department_ref`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `user_id` INT NOT NULL COMMENT '用户id',
-    `company_id` INT NOT NULL COMMENT '公司id',
     `department_id` INT NOT NULL COMMENT '部门id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
