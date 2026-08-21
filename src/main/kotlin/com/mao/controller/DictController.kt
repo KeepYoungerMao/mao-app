@@ -17,11 +17,11 @@ class DictController(private val dictService: DictService) {
 
     @PostMapping("region/tree")
     @OperationLog(operation = Operation.ALL)
-    suspend fun regionTree(): List<DictTreeVo<ProvinceCityDistrictVo>> = dictService.listProvinceCityDistrict()
+    suspend fun regionTree(): List<ProvinceCityDistrictVo> = dictService.listProvinceCityDistrict()
 
     @PostMapping("industry/tree")
     @OperationLog(operation = Operation.ALL)
-    suspend fun industryTree(): List<DictTreeVo<IndustryVo>> = dictService.listIndustry()
+    suspend fun industryTree(): List<IndustryVo> = dictService.listIndustry()
 
     @PostMapping("type/create")
     @OperationLog(operation = Operation.CREATE)

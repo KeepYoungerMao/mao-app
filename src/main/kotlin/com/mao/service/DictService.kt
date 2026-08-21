@@ -30,8 +30,8 @@ class DictService(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Volatile
     private var dictCache: List<DictGroupVo>? = null
-    private val regionTree = CompletableDeferred<List<DictTreeVo<ProvinceCityDistrictVo>>>()
-    private val industryTree = CompletableDeferred<List<DictTreeVo<IndustryVo>>>()
+    private val regionTree = CompletableDeferred<List<ProvinceCityDistrictVo>>()
+    private val industryTree = CompletableDeferred<List<IndustryVo>>()
 
     @EventListener(ApplicationReadyEvent::class)
     fun preload() {
@@ -39,12 +39,12 @@ class DictService(
         scope.launch {
             runCatching {
                 buildTree(regionRepository.findAll().toList().map {
-                    DictTreeVo(it.id, it.pid, it.name, ProvinceCityDistrictVo(it.id, it.pid, it.code, it.name))
+                    ProvinceCityDistrictVo(it.id, it.pid, it.code, it.name)
                 })
             }.onSuccess(regionTree::complete).onFailure(regionTree::completeExceptionally)
             runCatching {
                 buildTree(industryRepository.findAllByOrderByPidAscIdAsc().toList().map {
-                    DictTreeVo(it.id, it.pid, it.name, IndustryVo(it.id, it.pid, it.code, it.name, it.description))
+                    IndustryVo(it.id, it.pid, it.code, it.name, it.description)
                 })
             }.onSuccess(industryTree::complete).onFailure(industryTree::completeExceptionally)
         }
@@ -61,9 +61,9 @@ class DictService(
 
     suspend fun listDictGroups(): List<DictGroupVo> = getDictGroups()
 
-    suspend fun listProvinceCityDistrict(): List<DictTreeVo<ProvinceCityDistrictVo>> = regionTree.await()
+    suspend fun listProvinceCityDistrict(): List<ProvinceCityDistrictVo> = regionTree.await()
 
-    suspend fun listIndustry(): List<DictTreeVo<IndustryVo>> = industryTree.await()
+    suspend fun listIndustry(): List<IndustryVo> = industryTree.await()
 
     @Transactional
     suspend fun createType(request: DictTypeAddQo): DictTypeVo {
@@ -128,11 +128,5 @@ class DictService(
     private fun evictTypes() { dictCache = null }
     private fun evictItems() { dictCache = null }
     private fun evictAll() { dictCache = null }
-
-    private fun <T> buildTree(nodes: List<DictTreeVo<T>>): List<DictTreeVo<T>> {
-        val children = nodes.groupBy { it.pid }
-        fun branch(node: DictTreeVo<T>): DictTreeVo<T> = node.copy(children = children[node.id].orEmpty().map(::branch))
-        return nodes.filter { it.pid == 0 || nodes.none { parent -> parent.id == it.pid } }.map(::branch)
-    }
 
 }
