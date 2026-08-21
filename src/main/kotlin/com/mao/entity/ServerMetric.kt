@@ -6,6 +6,9 @@ import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
+/**
+ * 服务器指标实体类
+ */
 @Table("sys_server_metric")
 data class ServerMetric(
     @Id val id: Long,
@@ -24,6 +27,9 @@ data class ServerMetric(
     override fun isNew(): Boolean = isNewRecord
 }
 
+/**
+ * 服务器信息实体类
+ */
 data class ServerInfo(
     val serverName: String,
     val version: String,

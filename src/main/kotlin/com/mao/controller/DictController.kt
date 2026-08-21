@@ -46,4 +46,5 @@ class DictController(private val dictService: DictService) {
     @PostMapping("item/delete")
     @OperationLog(operation = Operation.DELETE)
     suspend fun deleteItem(@Valid @RequestBody request: IdQo<Int>): Tips = dictService.deleteItem(request.id)
+
 }

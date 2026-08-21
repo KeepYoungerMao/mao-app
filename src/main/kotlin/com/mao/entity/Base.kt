@@ -3,7 +3,9 @@ package com.mao.entity
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
-/** 数据库公共字段类。 */
+/**
+ * 数据库公共字段类
+ */
 open class BaseDo {
     var deleted: Boolean? = null
     @org.springframework.data.annotation.CreatedBy
@@ -16,7 +18,9 @@ open class BaseDo {
     var updateTime: LocalDateTime? = null
 }
 
-/** 查询结果数据公共字段类。 */
+/**
+ * 查询结果数据公共字段类
+ */
 open class BaseVo {
     var creator: String? = null
     var createTime: LocalDateTime? = null
@@ -24,12 +28,17 @@ open class BaseVo {
     var updateTime: LocalDateTime? = null
 }
 
+/**
+ * 根据数据ID进行操作的请求参数。
+ */
 data class IdQo<T>(
     @field:NotNull(message = "请传递数据ID以操作")
     val id: T?
 )
 
-/** 分页查询参数。 */
+/**
+ * 分页查询参数
+ */
 open class PageQo {
     var pageNum: Int = 1
     var pageSize: Int = 10
@@ -49,7 +58,9 @@ interface Tree<T : Tree<T>> {
     fun withChildren(children: List<T>): T
 }
 
-/** 将扁平节点集合构建为森林，父节点不存在、pid 为 null 或 0 的节点作为根节点。 */
+/**
+ * 将扁平节点集合构建为森林，父节点不存在、pid 为 null 或 0 的节点作为根节点
+ */
 fun <T : Tree<T>> buildTree(nodes: List<T>): List<T> {
     val ids = nodes.mapNotNull(Tree<T>::id)
     require(ids.size == ids.toSet().size) { "树节点 ID 不能重复" }
