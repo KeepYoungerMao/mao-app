@@ -22,18 +22,6 @@ class DictController(private val dictService: DictService) {
     @PostMapping("industry/tree")
     @OperationLog(operation = Operation.ALL)
     suspend fun industryTree(): List<IndustryVo> = dictService.listIndustry()
-
-    @PostMapping("type/create")
-    @OperationLog(operation = Operation.CREATE)
-    suspend fun createType(@Valid @RequestBody request: DictTypeAddQo): DictTypeVo = dictService.createType(request)
-    
-    @PostMapping("type/update")
-    @OperationLog(operation = Operation.UPDATE)
-    suspend fun updateType(@Valid @RequestBody request: DictTypeUpdateQo): DictTypeVo = dictService.updateType(request)
-    
-    @PostMapping("type/delete")
-    @OperationLog(operation = Operation.DELETE)
-    suspend fun deleteType(@Valid @RequestBody request: IdQo<Int>): Tips = dictService.deleteType(request.id)
     
     @PostMapping("item/create")
     @OperationLog(operation = Operation.CREATE)
@@ -43,8 +31,8 @@ class DictController(private val dictService: DictService) {
     @OperationLog(operation = Operation.UPDATE)
     suspend fun updateItem(@Valid @RequestBody request: DictItemUpdateQo): DictItemVo = dictService.updateItem(request)
     
-    @PostMapping("item/delete")
+    @PostMapping("item/disable")
     @OperationLog(operation = Operation.DELETE)
-    suspend fun deleteItem(@Valid @RequestBody request: IdQo<Int>): Tips = dictService.deleteItem(request.id)
+    suspend fun disableItem(@Valid @RequestBody request: IdQo<Int>): Tips = dictService.disableItem(request.id)
 
 }

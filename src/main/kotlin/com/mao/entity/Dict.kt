@@ -13,25 +13,75 @@ enum class DictType(val id: Int) {
 }
 
 @Table("sys_dict")
-data class DictTypeDo(@Id var id: Int? = null, var name: String? = null, var description: String? = null)
+data class DictTypeDo(
+    @Id 
+    var id: Int? = null, 
+    var name: String? = null, 
+    var description: String? = null
+)
 
 @Table("sys_dict_item")
-data class DictItemDo(@Id var id: Int? = null, var pid: Int? = null, var name: String? = null) : BaseDo()
+data class DictItemDo(
+    @Id 
+    var id: Int? = null, 
+    var pid: Int? = null, 
+    var name: String? = null,
+    var status: Int? = null
+) : BaseDo()
 
 @Table("sys_province_city_district")
-data class ProvinceCityDistrictDo(@Id var id: Int? = null, var pid: Int? = null, var code: String? = null, var name: String? = null)
+data class ProvinceCityDistrictDo(
+    @Id 
+    var id: Int? = null, 
+    var pid: Int? = null, 
+    var code: String? = null, 
+    var name: String? = null
+)
 
 @Table("sys_industry_2017")
-data class IndustryDo(@Id var id: Int? = null, var pid: Int? = null, var code: String? = null, var name: String? = null, var description: String? = null)
+data class IndustryDo(
+    @Id 
+    var id: Int? = null, 
+    var pid: Int? = null, 
+    var code: String? = null, 
+    var name: String? = null, 
+    var description: String? = null
+)
 
-data class DictTypeAddQo(@field:NotBlank @field:Length(max = 50) val name: String? = null, @field:Length(max = 256) val description: String? = null)
-data class DictTypeUpdateQo(@field:NotNull val id: Int? = null, @field:NotBlank @field:Length(max = 50) val name: String? = null, @field:Length(max = 256) val description: String? = null)
-data class DictItemAddQo(@field:NotNull val pid: Int? = null, @field:NotBlank @field:Length(max = 100) val name: String? = null)
-data class DictItemUpdateQo(@field:NotNull val id: Int? = null, @field:NotNull val pid: Int? = null, @field:NotBlank @field:Length(max = 100) val name: String? = null)
+data class DictItemAddQo(
+    @field:NotNull 
+    val pid: Int? = null, 
+    @field:NotBlank
+    @field:Length(max = 100) 
+    val name: String? = null
+)
 
-data class DictTypeVo(val id: Int?, val name: String?, val description: String?)
-data class DictItemVo(val id: Int?, val pid: Int?, val name: String?)
-data class DictGroupVo(val type: DictTypeVo, val items: List<DictItemVo>)
+data class DictItemUpdateQo(
+    @field:NotNull 
+    val id: Int? = null, 
+    @field:NotBlank 
+    @field:Length(max = 100) 
+    val name: String? = null
+)
+
+data class DictTypeVo(
+    val id: Int?, 
+    val name: String?, 
+    val description: String?
+)
+
+data class DictItemVo(
+    val id: Int?, 
+    val pid: Int?, 
+    val name: String?,
+    val status: Int? = null
+)
+
+data class DictGroupVo(
+    val type: DictTypeVo, 
+    val items: List<DictItemVo>
+)
+
 data class ProvinceCityDistrictVo(
     override val id: Int?,
     override val pid: Int?,

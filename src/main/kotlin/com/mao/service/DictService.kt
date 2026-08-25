@@ -2,7 +2,10 @@ package com.mao.service
 
 import com.mao.entity.*
 import com.mao.ex.AppException
-import com.mao.repository.*
+import com.mao.repository.DictItemRepository
+import com.mao.repository.DictTypeRepository
+import com.mao.repository.IndustryRepository
+import com.mao.repository.ProvinceCityDistrictRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,67 +69,58 @@ class DictService(
     suspend fun listIndustry(): List<IndustryVo> = industryTree.await()
 
     @Transactional
-    suspend fun createType(request: DictTypeAddQo): DictTypeVo {
-        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
-        if (dictTypeRepository.findByName(name) != null) throw AppException(ErrorCode.BAD_REQUEST, "字典名称已存在")
-        return toTypeVo(dictTypeRepository.save(DictTypeDo(name = name, description = request.description))).also { evictTypes() }
-    }
-
-    @Transactional
-    suspend fun updateType(request: DictTypeUpdateQo): DictTypeVo {
-        val old = dictTypeRepository.findById(request.id ?: throw AppException(ErrorCode.BAD_REQUEST))
-            ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
-        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
-        val duplicate = dictTypeRepository.findByName(name)
-        if (duplicate?.id != old.id) throw AppException(ErrorCode.BAD_REQUEST, "字典名称已存在")
-        old.name = name; old.description = request.description
-        return toTypeVo(dictTypeRepository.save(old)).also { evictTypes() }
-    }
-
-    @Transactional
-    suspend fun deleteType(id: Int?): Tips {
-        val typeId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
-        dictTypeRepository.findById(typeId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
-        dictTypeRepository.deleteById(typeId)
-        getDictGroups().firstOrNull { it.type.id == typeId }?.items
-            ?.forEach { item -> item.id?.let { dictItemRepository.deleteById(it) } }
-        evictAll(); return Tips("数据删除成功")
-    }
-
-    @Transactional
     suspend fun createItem(request: DictItemAddQo): DictItemVo {
         val pid = request.pid ?: throw AppException(ErrorCode.BAD_REQUEST)
-        ensureType(pid)
-        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
-        if (getDictGroups().any { it.type.id == pid && it.items.any { item -> item.name == name } })
+        if (dictTypeRepository.findById(pid) == null) {
+            throw AppException(ErrorCode.BAD_REQUEST, "父字典不存在")    
+        }
+        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST, "请传递字典名称")
+        // 重名检测
+        if (dictItemRepository.findByPidAndName(pid, name) != null) {
             throw AppException(ErrorCode.BAD_REQUEST, "同一字典下名称已存在")
-        return toItemVo(dictItemRepository.save(DictItemDo(pid = pid, name = name))).also { evictItems() }
+        }
+        // 数据保存
+        val dictItem = dictItemRepository.save(DictItemDo(pid = pid, name = name, status = 1))
+        // 清空缓存
+        evictDictCache()
+        // 返回结果
+        return toItemVo(dictItem)
     }
 
     @Transactional
     suspend fun updateItem(request: DictItemUpdateQo): DictItemVo {
-        val item = dictItemRepository.findById(request.id ?: throw AppException(ErrorCode.BAD_REQUEST))
-            ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
-        val pid = request.pid ?: throw AppException(ErrorCode.BAD_REQUEST); ensureType(pid)
-        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
-        if (getDictGroups().any { it.type.id == pid && it.items.any { candidate -> candidate.id != item.id && candidate.name == name } })
+        // 参数校验
+        val id = request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val item = dictItemRepository.findById(id) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST, "请传递字典名称")
+        // 重名检测
+        if (dictItemRepository.findByPidAndNameAndIdNot(item.pid!!, name, id) != null) {
             throw AppException(ErrorCode.BAD_REQUEST, "同一字典下名称已存在")
-        item.pid = pid; item.name = name
-        return toItemVo(dictItemRepository.save(item)).also { evictItems() }
+        }
+        // 数据保存
+        val dictItem = dictItemRepository.save(DictItemDo(id = id, pid = item.pid, name = name, status = item.status))
+        // 清空缓存
+        evictDictCache()
+        // 返回结果
+        return toItemVo(dictItem)
     }
 
     @Transactional
-    suspend fun deleteItem(id: Int?): Tips {
+    suspend fun disableItem(id: Int?): Tips {
         val itemId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
-        dictItemRepository.findById(itemId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
-        dictItemRepository.deleteById(itemId); evictItems(); return Tips("数据删除成功")
+        val item = dictItemRepository.findById(itemId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        // 数据保存
+        item.status = 0
+        dictItemRepository.save(item)
+        // 清空缓存
+        evictDictCache()
+        return Tips("数据禁用成功")
     }
 
-    private suspend fun ensureType(id: Int) { if (dictTypeRepository.findById(id) == null) throw AppException(ErrorCode.BAD_REQUEST, "父字典不存在") }
     private fun toTypeVo(v: DictTypeDo) = DictTypeVo(v.id, v.name, v.description)
-    private fun toItemVo(v: DictItemDo) = DictItemVo(v.id, v.pid, v.name)
-    private fun evictTypes() { dictCache = null }
-    private fun evictItems() { dictCache = null }
-    private fun evictAll() { dictCache = null }
+
+    private fun toItemVo(v: DictItemDo) = DictItemVo(v.id, v.pid, v.name, v.status)
+    
+    private fun evictDictCache() { dictCache = null }
 
 }

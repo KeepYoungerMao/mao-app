@@ -25,6 +25,7 @@ CREATE TABLE `sys_dict_item`
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `pid` INT NOT NULL COMMENT '父主键',
     `name` VARCHAR(100) NOT NULL COMMENT '名称',
+    `status` INT NOT NULL DEFAULT 1 COMMENT '状态，1：启用，0：禁用',
     `deleted` TINYINT DEFAULT 0 COMMENT '删除标识',
     `creator` VARCHAR(20) COMMENT '创建用户',
     `create_time` DATETIME(3) COMMENT '创建时间',

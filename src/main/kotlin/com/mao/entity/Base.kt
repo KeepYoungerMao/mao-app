@@ -1,5 +1,9 @@
 package com.mao.entity
 
+import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
@@ -8,13 +12,13 @@ import java.time.LocalDateTime
  */
 open class BaseDo {
     var deleted: Boolean? = null
-    @org.springframework.data.annotation.CreatedBy
+    @CreatedBy
     var creator: String? = null
-    @org.springframework.data.annotation.CreatedDate
+    @CreatedDate
     var createTime: LocalDateTime? = null
-    @org.springframework.data.annotation.LastModifiedBy
+    @LastModifiedBy
     var updater: String? = null
-    @org.springframework.data.annotation.LastModifiedDate
+    @LastModifiedDate
     var updateTime: LocalDateTime? = null
 }
 
