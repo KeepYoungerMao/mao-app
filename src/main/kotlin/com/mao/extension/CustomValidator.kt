@@ -4,10 +4,85 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
+import com.mao.entity.DictType
+import com.mao.service.DictService
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.ResolverStyle
 import kotlin.reflect.KClass
+
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [DictValidator::class])
+annotation class Dict(
+    val type: DictType,
+    val message: String = "字典项不存在或已停用",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = []
+)
+
+/**
+ * 字典校验器
+ */
+class DictValidator(
+    private val dictService: DictService,
+) : ConstraintValidator<Dict, Int> {
+    private lateinit var type: DictType
+
+    override fun initialize(annotation: Dict) {
+        type = annotation.type
+    }
+
+    override fun isValid(value: Int?, context: ConstraintValidatorContext?): Boolean {
+        // null值由@NotNull/@NotBlank负责，此处放行
+        if (value == null) return true
+        return dictService.isActiveItem(type, value)
+    }
+}
+
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ProvinceCityDistrictValidator::class])
+annotation class ProvinceCityDistrict(
+    val message: String = "省市区ID不存在",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = []
+)
+
+/**
+ * 省市区校验器
+ */
+class ProvinceCityDistrictValidator(
+    private val dictService: DictService,
+) : ConstraintValidator<ProvinceCityDistrict, Int> {
+    override fun isValid(value: Int?, context: ConstraintValidatorContext?): Boolean {
+        // null值由@NotNull负责，此处放行
+        if (value == null) return true
+        return dictService.isProvinceCityDistrict(value)
+    }
+}
+
+@Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [IndustryValidator::class])
+annotation class Industry(
+    val message: String = "行业ID不存在",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = []
+)
+
+/**
+ * 行业校验器
+ */
+class IndustryValidator(
+    private val dictService: DictService,
+) : ConstraintValidator<Industry, Int> {
+    override fun isValid(value: Int?, context: ConstraintValidatorContext?): Boolean {
+        // null值由@NotNull负责，此处放行
+        if (value == null) return true
+        return dictService.isIndustry(value)
+    }
+}
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)

@@ -37,6 +37,7 @@ CREATE TABLE sys_dict_item (
    id SERIAL PRIMARY KEY,
    pid INTEGER NOT NULL,
    name VARCHAR(100) NOT NULL,
+   status INT NOT NULL DEFAULT 1,
    creator VARCHAR(20),
    create_time TIMESTAMP(3),
    updater VARCHAR(20),
@@ -46,6 +47,7 @@ COMMENT ON TABLE sys_dict_item IS '字典项表';
 COMMENT ON COLUMN sys_dict_item.id IS '主键';
 COMMENT ON COLUMN sys_dict_item.pid IS '父主键';
 COMMENT ON COLUMN sys_dict_item.name IS '名称';
+COMMENT ON COLUMN sys_dict_item.status IS '状态, 0=禁用，1=启用';
 COMMENT ON COLUMN sys_dict_item.creator IS '创建用户';
 COMMENT ON COLUMN sys_dict_item.create_time IS '创建时间';
 COMMENT ON COLUMN sys_dict_item.updater IS '更新用户';
@@ -368,6 +370,7 @@ CREATE TABLE sys_user_profile_work (
     company_name VARCHAR(50) NOT NULL,
     job_title VARCHAR(30),
     industry VARCHAR(50),
+    industry_id INTEGER,
     start_date DATE,
     end_date DATE,
     responsibilities TEXT,
@@ -385,6 +388,7 @@ COMMENT ON COLUMN sys_user_profile_work.user_id IS '用户id';
 COMMENT ON COLUMN sys_user_profile_work.company_name IS '公司/单位名称';
 COMMENT ON COLUMN sys_user_profile_work.job_title IS '职位名称';
 COMMENT ON COLUMN sys_user_profile_work.industry IS '所在行业';
+COMMENT ON COLUMN sys_user_profile_work.industry_id IS '所在行业ID';
 COMMENT ON COLUMN sys_user_profile_work.start_date IS '入职日期';
 COMMENT ON COLUMN sys_user_profile_work.end_date IS '离职日期';
 COMMENT ON COLUMN sys_user_profile_work.responsibilities IS '工作职责和主要成就';

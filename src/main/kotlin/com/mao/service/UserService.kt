@@ -248,9 +248,9 @@ class UserService(
     suspend fun updateUserProfile(userProfileUpdate: UserProfileUpdateQo): UserProfileVo {
         val id = userProfileUpdate.id ?: throw AppException(ErrorCode.BAD_REQUEST)
         val userProfile = userProfileRepository.findById(id) ?: throw AppException(ErrorCode.BAD_REQUEST)
-        val userProfileUpdate = userProfileMapper.copyToExistDo(userProfileUpdate, userProfile)
-        userProfileRepository.save(userProfileUpdate)
-        return userProfileMapper.toVo(userProfile)
+        val userProfileUpdateDo = userProfileMapper.copyToExistDo(userProfileUpdate, userProfile)
+        val updatedUserProfile = userProfileRepository.save(userProfileUpdateDo)
+        return userProfileMapper.toVo(updatedUserProfile)
     }
 
     /**

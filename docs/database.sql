@@ -249,6 +249,7 @@ CREATE TABLE `sys_user_profile_work`
     `company_name` VARCHAR(50) NOT NULL COMMENT '公司/单位名称',
     `job_title` VARCHAR(30) COMMENT '职位名称',
     `industry` VARCHAR(50) COMMENT '所在行业',
+    `industry_id` INT COMMENT '所在行业ID',
     `start_date` DATE COMMENT '入职日期',
     `end_date` DATE COMMENT '离职日期',
     `responsibilities` TEXT COMMENT '工作职责和主要成就',

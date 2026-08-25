@@ -1,7 +1,9 @@
 package com.mao.entity
 
 import com.mao.extension.IdCard
+import com.mao.extension.Dict
 import com.mao.extension.Phone
+import com.mao.extension.ProvinceCityDistrict
 import com.mao.extension.QueryField
 import com.mao.extension.Username
 import jakarta.validation.constraints.Email
@@ -132,7 +134,7 @@ data class UserProfileVo(
     val high: Double? = null,
     val weight: Double? = null, 
     val provinceId: Int? = null, 
-    val cityId: Int? = null,
+    val cityId: Int? = null, 
     val districtId: Int? = null, 
     val address: String? = null, 
     val birthday: LocalDate? = null,
@@ -144,7 +146,7 @@ data class UserProfileVo(
     val major: String? = null,
     val originProvinceId: Int? = null, 
     val originCityId: Int? = null, 
-    val originDistrictId: Int? = null,
+    val originDistrictId: Int? = null, 
     val originAddress: String? = null, 
     val familyPhone: String? = null, 
     val hobby: String? = null,
@@ -275,23 +277,35 @@ data class UserRoleUpdateQo(
 data class UserProfileUpdateQo(
     @field:NotNull 
     val id: Int? = null, 
+    @field:Dict(DictType.SEX)
     val sexId: Int? = null, 
     val bloodTypeId: Int? = null, 
     val high: Double? = null, 
     val weight: Double? = null, 
+    @field:ProvinceCityDistrict
     val provinceId: Int? = null, 
+    @field:ProvinceCityDistrict
     val cityId: Int? = null, 
+    @field:ProvinceCityDistrict
     val districtId: Int? = null, 
     val address: String? = null, 
     val birthday: LocalDate? = null, 
+    @field:Dict(DictType.NATION)
     val nationId: Int? = null, 
+    @field:Dict(DictType.COUNTRY)
     val countryId: Int? = null, 
+    @field:Dict(DictType.MARITAL)
     val maritalId: Int? = null, 
+    @field:Dict(DictType.POLITICAL)
     val politicalId: Int? = null, 
+    @field:Dict(DictType.EDUCATION)
     val educationId: Int? = null, 
     val major: String? = null, 
+    @field:ProvinceCityDistrict
     val originProvinceId: Int? = null, 
+    @field:ProvinceCityDistrict
     val originCityId: Int? = null, 
+    @field:ProvinceCityDistrict
     val originDistrictId: Int? = null, 
     val originAddress: String? = null, 
     val familyPhone: String? = null, 

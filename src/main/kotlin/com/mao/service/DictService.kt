@@ -33,6 +33,10 @@ class DictService(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Volatile
     private var dictCache: List<DictGroupVo>? = null
+    @Volatile
+    private var regionIds: Set<Int> = emptySet()
+    @Volatile
+    private var industryIds: Set<Int> = emptySet()
     private val regionTree = CompletableDeferred<List<ProvinceCityDistrictVo>>()
     private val industryTree = CompletableDeferred<List<IndustryVo>>()
 
@@ -40,13 +44,18 @@ class DictService(
     fun preload() {
         // 只加载一次并直接缓存最终树结构；接口调用只等待这两个永久快照。
         scope.launch {
+            runCatching { getDictGroups() }
             runCatching {
-                buildTree(regionRepository.findAll().toList().map {
+                val regions = regionRepository.findAll().toList()
+                regionIds = regions.mapNotNull(ProvinceCityDistrictDo::id).toSet()
+                buildTree(regions.map {
                     ProvinceCityDistrictVo(it.id, it.pid, it.code, it.name)
                 })
             }.onSuccess(regionTree::complete).onFailure(regionTree::completeExceptionally)
             runCatching {
-                buildTree(industryRepository.findAllByOrderByPidAscIdAsc().toList().map {
+                val industries = industryRepository.findAllByOrderByPidAscIdAsc().toList()
+                industryIds = industries.mapNotNull(IndustryDo::id).toSet()
+                buildTree(industries.map {
                     IndustryVo(it.id, it.pid, it.code, it.name, it.description)
                 })
             }.onSuccess(industryTree::complete).onFailure(industryTree::completeExceptionally)
@@ -56,7 +65,7 @@ class DictService(
     private suspend fun getDictGroups(): List<DictGroupVo> {
         dictCache?.let { return it }
         val types = dictTypeRepository.findAll().toList()
-        val items = dictItemRepository.findAll().toList()
+        val items = dictItemRepository.findAll().toList().filter { it.status != 0 }
         return types.map { type ->
             DictGroupVo(toTypeVo(type), items.filter { it.pid == type.id }.map(::toItemVo))
         }.also { dictCache = it }
@@ -67,6 +76,19 @@ class DictService(
     suspend fun listProvinceCityDistrict(): List<ProvinceCityDistrictVo> = regionTree.await()
 
     suspend fun listIndustry(): List<IndustryVo> = industryTree.await()
+
+    /**
+     * Bean Validation回调是同步接口，因此这里只读取启动时/写入后维护的内存快照，
+     * 不在WebFlux线程中阻塞等待协程或访问数据库。
+     */
+    fun isActiveItem(type: DictType, itemId: Int): Boolean =
+        dictCache?.any { group ->
+            group.type.id == type.id && group.items.any { it.id == itemId }
+        } == true
+
+    fun isProvinceCityDistrict(itemId: Int): Boolean = itemId in regionIds
+
+    fun isIndustry(itemId: Int): Boolean = itemId in industryIds
 
     @Transactional
     suspend fun createItem(request: DictItemAddQo): DictItemVo {
@@ -82,7 +104,7 @@ class DictService(
         // 数据保存
         val dictItem = dictItemRepository.save(DictItemDo(pid = pid, name = name, status = 1))
         // 清空缓存
-        evictDictCache()
+        refreshDictCache()
         // 返回结果
         return toItemVo(dictItem)
     }
@@ -100,7 +122,7 @@ class DictService(
         // 数据保存
         val dictItem = dictItemRepository.save(DictItemDo(id = id, pid = item.pid, name = name, status = item.status))
         // 清空缓存
-        evictDictCache()
+        refreshDictCache()
         // 返回结果
         return toItemVo(dictItem)
     }
@@ -113,7 +135,7 @@ class DictService(
         item.status = 0
         dictItemRepository.save(item)
         // 清空缓存
-        evictDictCache()
+        refreshDictCache()
         return Tips("数据禁用成功")
     }
 
@@ -121,6 +143,9 @@ class DictService(
 
     private fun toItemVo(v: DictItemDo) = DictItemVo(v.id, v.pid, v.name, v.status)
     
-    private fun evictDictCache() { dictCache = null }
+    private suspend fun refreshDictCache() {
+        dictCache = null
+        getDictGroups()
+    }
 
 }
