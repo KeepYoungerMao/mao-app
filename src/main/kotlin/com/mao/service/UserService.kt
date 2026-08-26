@@ -7,14 +7,8 @@ import com.mao.listener.UserCreateEvent
 import com.mao.listener.UserPasswordResetEvent
 import com.mao.listener.UserStatusUpdateEvent
 import com.mao.listener.UserStatusUpdateType
-import com.mao.mapper.DepartmentMapper
-import com.mao.mapper.RoleMapper
-import com.mao.mapper.UserMapper
-import com.mao.mapper.UserProfileMapper
-import com.mao.repository.UserDepartmentRefRepository
-import com.mao.repository.UserProfileRepository
-import com.mao.repository.UserRepository
-import com.mao.repository.UserRoleRefRepository
+import com.mao.mapper.*
+import com.mao.repository.*
 import com.mao.util.currentUser
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -38,7 +32,15 @@ class UserService(
     private val userRoleRefRepository: UserRoleRefRepository,
     private val userDepartmentRefRepository: UserDepartmentRefRepository,
     private val userProfileRepository: UserProfileRepository,
+    private val userProfileEducationRepository: UserProfileEducationRepository,
+    private val userProfileWorkRepository: UserProfileWorkRepository,
+    private val userProfileRelationshipRepository: UserProfileRelationshipRepository,
+    private val userProfileMaterialRepository: UserProfileMaterialRepository,
     private val userProfileMapper: UserProfileMapper,
+    private val userProfileEducationMapper: UserProfileEducationMapper,
+    private val userProfileWorkMapper: UserProfileWorkMapper,
+    private val userProfileRelationshipMapper: UserProfileRelationshipMapper,
+    private val userProfileMaterialMapper: UserProfileMaterialMapper,
     private val roleMapper: RoleMapper,
     private val departmentMapper: DepartmentMapper,
 ) {
@@ -253,6 +255,146 @@ class UserService(
         return userProfileMapper.toVo(updatedUserProfile)
     }
 
+    suspend fun searchUserProfileEducations(userId: Int?): List<UserProfileEducationVo> {
+        val id = userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(id)
+        return userProfileEducationRepository.findAllByUserIdOrderByStartDate(id)
+            .map(userProfileEducationMapper::toVo)
+            .toList()
+    }
+
+    @Transactional
+    suspend fun createUserProfileEducation(request: UserProfileEducationAddQo): UserProfileEducationVo {
+        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(userId)
+        val education = userProfileEducationRepository.save(userProfileEducationMapper.toDo(request))
+        return userProfileEducationMapper.toVo(education)
+    }
+
+    @Transactional
+    suspend fun updateUserProfileEducation(request: UserProfileEducationUpdateQo): UserProfileEducationVo {
+        val education = userProfileEducationRepository.findById(request.id ?: throw AppException(ErrorCode.BAD_REQUEST))
+            ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val updated = userProfileEducationRepository.save(
+            userProfileEducationMapper.copyToExistDo(request, education)
+        )
+        return userProfileEducationMapper.toVo(updated)
+    }
+
+    @Transactional
+    suspend fun deleteUserProfileEducation(id: Int?): Tips {
+        val educationId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userProfileEducationRepository.findById(educationId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        userProfileEducationRepository.deleteById(educationId)
+        return Tips("数据删除成功")
+    }
+
+    suspend fun searchUserProfileWorks(userId: Int?): List<UserProfileWorkVo> {
+        val id = userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(id)
+        return userProfileWorkRepository.findAllByUserIdOrderByStartDate(id)
+            .map(userProfileWorkMapper::toVo)
+            .toList()
+    }
+
+    @Transactional
+    suspend fun createUserProfileWork(request: UserProfileWorkAddQo): UserProfileWorkVo {
+        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(userId)
+        val work = userProfileWorkRepository.save(userProfileWorkMapper.toDo(request))
+        return userProfileWorkMapper.toVo(work)
+    }
+
+    @Transactional
+    suspend fun updateUserProfileWork(request: UserProfileWorkUpdateQo): UserProfileWorkVo {
+        val work = userProfileWorkRepository.findById(request.id ?: throw AppException(ErrorCode.BAD_REQUEST))
+            ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val updated = userProfileWorkRepository.save(userProfileWorkMapper.copyToExistDo(request, work))
+        return userProfileWorkMapper.toVo(updated)
+    }
+
+    @Transactional
+    suspend fun deleteUserProfileWork(id: Int?): Tips {
+        val workId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userProfileWorkRepository.findById(workId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        userProfileWorkRepository.deleteById(workId)
+        return Tips("数据删除成功")
+    }
+
+    suspend fun searchUserProfileRelationships(userId: Int?): List<UserProfileRelationshipVo> {
+        val id = userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(id)
+        return userProfileRelationshipRepository.findAllByUserIdOrderByCreateTime(id)
+            .map(userProfileRelationshipMapper::toVo)
+            .toList()
+    }
+
+    @Transactional
+    suspend fun createUserProfileRelationship(
+        request: UserProfileRelationshipAddQo
+    ): UserProfileRelationshipVo {
+        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(userId)
+        val relationship = userProfileRelationshipRepository.save(userProfileRelationshipMapper.toDo(request))
+        return userProfileRelationshipMapper.toVo(relationship)
+    }
+
+    @Transactional
+    suspend fun updateUserProfileRelationship(
+        request: UserProfileRelationshipUpdateQo
+    ): UserProfileRelationshipVo {
+        val relationship = userProfileRelationshipRepository.findById(
+            request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        ) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val updated = userProfileRelationshipRepository.save(
+            userProfileRelationshipMapper.copyToExistDo(request, relationship)
+        )
+        return userProfileRelationshipMapper.toVo(updated)
+    }
+
+    @Transactional
+    suspend fun deleteUserProfileRelationship(id: Int?): Tips {
+        val relationshipId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userProfileRelationshipRepository.findById(relationshipId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        userProfileRelationshipRepository.deleteById(relationshipId)
+        return Tips("数据删除成功")
+    }
+
+    suspend fun searchUserProfileMaterials(userId: Int?): List<UserProfileMaterialVo> {
+        val id = userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(id)
+        return userProfileMaterialRepository.findAllByUserIdOrderByCreateTime(id)
+            .map(userProfileMaterialMapper::toVo)
+            .toList()
+    }
+
+    @Transactional
+    suspend fun createUserProfileMaterial(request: UserProfileMaterialAddQo): UserProfileMaterialVo {
+        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userRepository.findByIdOrThrow(userId)
+        val material = userProfileMaterialRepository.save(userProfileMaterialMapper.toDo(request))
+        return userProfileMaterialMapper.toVo(material)
+    }
+
+    @Transactional
+    suspend fun updateUserProfileMaterial(request: UserProfileMaterialUpdateQo): UserProfileMaterialVo {
+        val material = userProfileMaterialRepository.findById(
+            request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        ) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val updated = userProfileMaterialRepository.save(
+            userProfileMaterialMapper.copyToExistDo(request, material)
+        )
+        return userProfileMaterialMapper.toVo(updated)
+    }
+
+    @Transactional
+    suspend fun deleteUserProfileMaterial(id: Int?): Tips {
+        val materialId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        userProfileMaterialRepository.findById(materialId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        userProfileMaterialRepository.deleteById(materialId)
+        return Tips("数据删除成功")
+    }
+
     /**
      * 删除用户数据
      * 谨慎操作：删除用户会同时删除：用户资料、用户教育经历、工作经历、人群关系、递交材料等信息
@@ -267,7 +409,21 @@ class UserService(
         // delete user_role_ref
         val count1 = userRoleRefRepository.deleteByUserId(user.id!!)
         log.info("user: [{}] operate: delete user [{}] role ref [count: {}]", operateUser, user.username, count1)
-        // TODO delete user_profile_*
+        // delete user_profile
+        val count2 = userProfileRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete user [{}] profile [count: {}]", operateUser, user.username, count2)
+        // delete user_profile_education
+        val count3 = userProfileEducationRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete user [{}] education [count: {}]", operateUser, user.username, count3)
+        // delete user_profile_work
+        val count4 = userProfileWorkRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete user [{}] work [count: {}]", operateUser, user.username, count4)
+        // delete user_profile_relationship
+        val count5 = userProfileRelationshipRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete user [{}] relationship [count: {}]", operateUser, user.username, count5)
+        // delete user_profile_material
+        val count6 = userProfileMaterialRepository.deleteByUserId(user.id!!)
+        log.info("user: [{}] operate: delete user [{}] material [count: {}]", operateUser, user.username, count6)
         // 发布角色删除事件
         eventPublisher.publishEvent(UserStatusUpdateEvent(user.username!!, UserStatusUpdateType.DELETED))
         return Tips("数据删除成功")

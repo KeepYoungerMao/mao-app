@@ -339,7 +339,6 @@ CREATE TABLE sys_user_profile_education (
     start_date DATE,
     end_date DATE,
     additional_info TEXT,
-    "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
@@ -355,7 +354,6 @@ COMMENT ON COLUMN sys_user_profile_education.major IS '专业名称';
 COMMENT ON COLUMN sys_user_profile_education.start_date IS '入学日期';
 COMMENT ON COLUMN sys_user_profile_education.end_date IS '毕业日期';
 COMMENT ON COLUMN sys_user_profile_education.additional_info IS '其他教育相关经历';
-COMMENT ON COLUMN sys_user_profile_education."order" IS '排序';
 COMMENT ON COLUMN sys_user_profile_education.creator IS '创建用户';
 COMMENT ON COLUMN sys_user_profile_education.create_time IS '创建时间';
 COMMENT ON COLUMN sys_user_profile_education.updater IS '更新用户';
@@ -375,7 +373,6 @@ CREATE TABLE sys_user_profile_work (
     end_date DATE,
     responsibilities TEXT,
     current_employment BOOLEAN DEFAULT FALSE,
-    "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
@@ -393,7 +390,6 @@ COMMENT ON COLUMN sys_user_profile_work.start_date IS '入职日期';
 COMMENT ON COLUMN sys_user_profile_work.end_date IS '离职日期';
 COMMENT ON COLUMN sys_user_profile_work.responsibilities IS '工作职责和主要成就';
 COMMENT ON COLUMN sys_user_profile_work.current_employment IS '是否在职（true=在职，false=已离职）';
-COMMENT ON COLUMN sys_user_profile_work."order" IS '排序';
 COMMENT ON COLUMN sys_user_profile_work.creator IS '创建用户';
 COMMENT ON COLUMN sys_user_profile_work.create_time IS '创建时间';
 COMMENT ON COLUMN sys_user_profile_work.updater IS '更新用户';
@@ -410,7 +406,6 @@ CREATE TABLE sys_user_profile_relationship (
     id_card_num VARCHAR(18),
     phone VARCHAR(20),
     remark VARCHAR(300),
-    "order" INTEGER NOT NULL DEFAULT 0,
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
@@ -424,7 +419,6 @@ COMMENT ON COLUMN sys_user_profile_relationship.relationship_id IS '人员关系
 COMMENT ON COLUMN sys_user_profile_relationship.id_card_num IS '身份证号';
 COMMENT ON COLUMN sys_user_profile_relationship.phone IS '联系方式';
 COMMENT ON COLUMN sys_user_profile_relationship.remark IS '备注';
-COMMENT ON COLUMN sys_user_profile_relationship."order" IS '排序';
 COMMENT ON COLUMN sys_user_profile_relationship.creator IS '创建用户';
 COMMENT ON COLUMN sys_user_profile_relationship.create_time IS '创建时间';
 COMMENT ON COLUMN sys_user_profile_relationship.updater IS '更新用户';

@@ -1,11 +1,6 @@
 package com.mao.entity
 
-import com.mao.extension.IdCard
-import com.mao.extension.Dict
-import com.mao.extension.Phone
-import com.mao.extension.ProvinceCityDistrict
-import com.mao.extension.QueryField
-import com.mao.extension.Username
+import com.mao.extension.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
@@ -68,6 +63,65 @@ data class UserProfileDo(
     var familyPhone: String? = null,
     var hobby: String? = null,
     var remark: String? = null
+) : BaseDo()
+
+/**
+ * 用户教育经历实体类
+ */
+@Table("sys_user_profile_education")
+data class UserProfileEducationDo(
+    @Id var id: Int? = null,
+    var userId: Int? = null,
+    var institutionName: String? = null,
+    var degree: String? = null,
+    var major: String? = null,
+    var startDate: LocalDate? = null,
+    var endDate: LocalDate? = null,
+    var additionalInfo: String? = null
+) : BaseDo()
+
+/**
+ * 用户工作经历实体类
+ */
+@Table("sys_user_profile_work")
+data class UserProfileWorkDo(
+    @Id var id: Int? = null,
+    var userId: Int? = null,
+    var companyName: String? = null,
+    var jobTitle: String? = null,
+    var industry: String? = null,
+    var industryId: Int? = null,
+    var startDate: LocalDate? = null,
+    var endDate: LocalDate? = null,
+    var responsibilities: String? = null,
+    var currentEmployment: Boolean? = null
+) : BaseDo()
+
+/**
+ * 用户人员关系实体类
+ */
+@Table("sys_user_profile_relationship")
+data class UserProfileRelationshipDo(
+    @Id var id: Int? = null,
+    var userId: Int? = null,
+    var realName: String? = null,
+    var relationshipId: Int? = null,
+    var idCardNum: String? = null,
+    var phone: String? = null,
+    var remark: String? = null
+) : BaseDo()
+
+/**
+ * 用户上传材料实体类
+ */
+@Table("sys_user_profile_material")
+data class UserProfileMaterialDo(
+    @Id var id: Int? = null,
+    var userId: Int? = null,
+    var materialName: String? = null,
+    var filePath: String? = null,
+    var uploadTime: LocalDateTime? = null,
+    var description: String? = null
 ) : BaseDo()
 
 /**
@@ -154,12 +208,67 @@ data class UserProfileVo(
 ) : BaseVo()
 
 /**
+ * 用户教育经历查询结果包装类
+ */
+data class UserProfileEducationVo(
+    val id: Int? = null,
+    val userId: Int? = null,
+    val institutionName: String? = null,
+    val degree: String? = null,
+    val major: String? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val additionalInfo: String? = null
+) : BaseVo()
+
+/**
+ * 用户工作经历查询结果包装类
+ */
+data class UserProfileWorkVo(
+    val id: Int? = null,
+    val userId: Int? = null,
+    val companyName: String? = null,
+    val jobTitle: String? = null,
+    val industry: String? = null,
+    val industryId: Int? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val responsibilities: String? = null,
+    val currentEmployment: Boolean? = null
+) : BaseVo()
+
+/**
+ * 用户人员关系查询结果包装类
+ */
+data class UserProfileRelationshipVo(
+    val id: Int? = null,
+    val userId: Int? = null,
+    val realName: String? = null,
+    val relationshipId: Int? = null,
+    val idCardNum: String? = null,
+    val phone: String? = null,
+    val remark: String? = null
+) : BaseVo()
+
+/**
+ * 用户上传材料查询结果包装类
+ */
+data class UserProfileMaterialVo(
+    val id: Int? = null,
+    val userId: Int? = null,
+    val materialName: String? = null,
+    val filePath: String? = null,
+    val uploadTime: LocalDateTime? = null,
+    val description: String? = null
+) : BaseVo()
+
+/**
  * 用户详情查询结果包装类
  */
 data class UserDetailVo(
-    val user: UserVo, 
-    val profile: UserProfileVo, 
-    val roles: List<RoleVo>, 
+    val user: UserVo,
+    val profile: UserProfileVo,
+    val roles: List<RoleVo>,
     val departments: List<DepartmentVo>
 )
 
@@ -311,4 +420,147 @@ data class UserProfileUpdateQo(
     val familyPhone: String? = null, 
     val hobby: String? = null, 
     val remark: String? = null
+)
+
+/**
+ * 新增用户教育经历请求参数类
+ */
+data class UserProfileEducationAddQo(
+    @field:NotNull
+    val userId: Int? = null,
+    @field:NotBlank
+    @field:Length(max = 50)
+    val institutionName: String? = null,
+    @field:Length(max = 30)
+    val degree: String? = null,
+    @field:Length(max = 50)
+    val major: String? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val additionalInfo: String? = null
+)
+
+/**
+ * 更新用户教育经历请求参数类
+ */
+data class UserProfileEducationUpdateQo(
+    @field:NotNull
+    val id: Int? = null,
+    @field:Length(max = 50)
+    val institutionName: String? = null,
+    @field:Length(max = 30)
+    val degree: String? = null,
+    @field:Length(max = 50)
+    val major: String? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val additionalInfo: String? = null
+)
+
+/**
+ * 新增用户工作经历请求参数类
+ */
+data class UserProfileWorkAddQo(
+    @field:NotNull
+    val userId: Int? = null,
+    @field:NotBlank
+    @field:Length(max = 50)
+    val companyName: String? = null,
+    @field:Length(max = 30)
+    val jobTitle: String? = null,
+    @field:Length(max = 50)
+    val industry: String? = null,
+    val industryId: Int? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val responsibilities: String? = null,
+    val currentEmployment: Boolean? = null
+)
+
+/**
+ * 更新用户工作经历请求参数类
+ */
+data class UserProfileWorkUpdateQo(
+    @field:NotNull
+    val id: Int? = null,
+    @field:Length(max = 50)
+    val companyName: String? = null,
+    @field:Length(max = 30)
+    val jobTitle: String? = null,
+    @field:Length(max = 50)
+    val industry: String? = null,
+    val industryId: Int? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val responsibilities: String? = null,
+    val currentEmployment: Boolean? = null
+)
+
+/**
+ * 新增用户人员关系请求参数类
+ */
+data class UserProfileRelationshipAddQo(
+    @field:NotNull
+    val userId: Int? = null,
+    @field:NotBlank
+    @field:Length(max = 20)
+    val realName: String? = null,
+    @field:NotNull
+    @field:Dict(DictType.RELATIONSHIP)
+    val relationshipId: Int? = null,
+    @field:IdCard
+    val idCardNum: String? = null,
+    @field:Phone
+    val phone: String? = null,
+    @field:Length(max = 300)
+    val remark: String? = null
+)
+
+/**
+ * 更新用户人员关系请求参数类
+ */
+data class UserProfileRelationshipUpdateQo(
+    @field:NotNull
+    val id: Int? = null,
+    @field:Length(max = 20)
+    val realName: String? = null,
+    @field:Dict(DictType.RELATIONSHIP)
+    val relationshipId: Int? = null,
+    @field:IdCard
+    val idCardNum: String? = null,
+    @field:Phone
+    val phone: String? = null,
+    @field:Length(max = 300)
+    val remark: String? = null
+)
+
+/**
+ * 新增用户上传材料请求参数类
+ */
+data class UserProfileMaterialAddQo(
+    @field:NotNull
+    val userId: Int? = null,
+    @field:NotBlank
+    @field:Length(max = 50)
+    val materialName: String? = null,
+    @field:NotBlank
+    @field:Length(max = 1000)
+    val filePath: String? = null,
+    @field:NotNull
+    val uploadTime: LocalDateTime? = null,
+    val description: String? = null
+)
+
+/**
+ * 更新用户上传材料请求参数类
+ */
+data class UserProfileMaterialUpdateQo(
+    @field:NotNull
+    val id: Int? = null,
+    @field:Length(max = 50)
+    val materialName: String? = null,
+    @field:Length(max = 1000)
+    val filePath: String? = null,
+    val uploadTime: LocalDateTime? = null,
+    val description: String? = null
 )
