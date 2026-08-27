@@ -1,0 +1,40 @@
+{
+  "groups": [
+    {
+      "name": "app.jwt",
+      "type": "com.mao.config.JwtConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.jwt.private-key",
+      "type": "org.springframework.core.io.Resource",
+      "description": "JWT 私钥资源"
+    },
+    {
+      "name": "app.jwt.public-key",
+      "type": "org.springframework.core.io.Resource",
+      "description": "JWT 公钥资源"
+    },
+    {
+      "name": "app.jwt.access-token-expiration",
+      "type": "java.lang.Long",
+      "description": "访问令牌过期时间，单位为毫秒"
+    },
+    {
+      "name": "app.jwt.refresh-token-expiration",
+      "type": "java.lang.Long",
+      "description": "刷新令牌过期时间，单位为毫秒"
+    },
+    {
+      "name": "app.jwt.replay-attack-check",
+      "type": "java.lang.Boolean",
+      "description": "是否开启重放攻击检测"
+    },
+    {
+      "name": "app.jwt.replay-attack-time",
+      "type": "java.lang.Integer",
+      "description": "重放攻击检测时间，单位为毫秒"
+    }
+  ]
+}

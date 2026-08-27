@@ -10,7 +10,11 @@
 
 ### Added
 
+- 新增`additional-spring-configuration-metadata.json`
+
 ### Changed
+
+- `spring.mail.propertie`s属性使用`[]`方式设置
 
 ## [1.0.1] - 2026-08-26
 
