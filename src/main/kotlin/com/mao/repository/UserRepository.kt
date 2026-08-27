@@ -12,6 +12,9 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
 
     suspend fun findByUsername(username: String): UserDo?
 
+    @Query("select * from sys_user where id = :id for update")
+    suspend fun findByIdForUpdate(@Param("id") id: Int): UserDo?
+
     @Query("""
         SELECT u.*
         FROM sys_user u

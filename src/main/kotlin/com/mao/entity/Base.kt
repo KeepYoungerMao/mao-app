@@ -11,7 +11,6 @@ import java.time.LocalDateTime
  * 数据库公共字段类
  */
 open class BaseDo {
-    var deleted: Boolean? = null
     @CreatedBy
     var creator: String? = null
     @CreatedDate

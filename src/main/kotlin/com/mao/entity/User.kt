@@ -143,15 +143,38 @@ data class UserDepartmentRefDo(
     @Id val id: Int?,
     val userId: Int,
     val departmentId: Int,
+    var positionId: Int? = null,
+    var primaryAssignment: Boolean? = null,
+    var startDate: LocalDate? = null,
+    var endDate: LocalDate? = null,
+    var enabled: Boolean? = null
+) : BaseDo()
+
+/**
+ * 新增用户部门关联请求参数类
+ */
+data class UserDepartmentAddQo(
+    @field:NotNull
+    val userId: Int? = null,
+    @field:NotNull
+    val departmentId: Int? = null,
     val positionId: Int? = null,
-    val primaryAssignment: Boolean? = null,
+    val primaryAssignment: Boolean? = false,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null
+)
+
+/**
+ * 更新用户部门关联请求参数类。未传入的基础字段保持原值。
+ */
+data class UserDepartmentUpdateQo(
+    @field:NotNull
+    val id: Int? = null,
+    val positionId: Int? = null,
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
-    val enabled: Boolean? = null,
-    val creator: String? = null,
-    val createTime: LocalDateTime? = null,
-    val updater: String? = null,
-    val updateTime: LocalDateTime? = null
+    val primaryAssignment: Boolean? = null,
+    val enabled: Boolean? = null
 )
 
 /**

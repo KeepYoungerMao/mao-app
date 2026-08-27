@@ -49,6 +49,7 @@ enum class Operation {
     USER_LOCKED, 
     USER_ENABLED,
     USER_ROLE, 
+    USER_DEPARTMENT,
     ROLE_PERMISSION, 
     
     UNSET

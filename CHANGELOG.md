@@ -10,7 +10,8 @@
 
 ### Added
 
-- 新增`additional-spring-configuration-metadata.json`
+- 新增`additional-spring-configuration-metadata.json`；
+- 新增用户关联部门API接口；
 
 ### Changed
 

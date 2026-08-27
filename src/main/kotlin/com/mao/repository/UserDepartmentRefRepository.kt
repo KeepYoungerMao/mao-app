@@ -4,12 +4,21 @@ import com.mao.entity.DepartmentDo
 import com.mao.entity.UserDepartmentRefDo
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.r2dbc.repository.Query
+import org.springframework.data.r2dbc.repository.Modifying
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
 interface UserDepartmentRefRepository : CoroutineCrudRepository<UserDepartmentRefDo, Int> {
+
+    suspend fun findByUserIdAndDepartmentId(userId: Int, departmentId: Int): UserDepartmentRefDo?
+
+    suspend fun countByUserIdAndEnabled(userId: Int, enabled: Boolean): Long
+
+    @Modifying
+    @Query("update sys_user_department_ref set primary_assignment = false where user_id = :userId")
+    suspend fun clearPrimaryAssignment(@Param("userId") userId: Int): Int
 
     /**
      * 根据用户id查询直接关联的部门列表

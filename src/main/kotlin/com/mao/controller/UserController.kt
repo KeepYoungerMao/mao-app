@@ -152,6 +152,16 @@ class UserController(
     @OperationLog(module = OperationModule.USER_PROFILE, operation = Operation.DELETE)
     suspend fun deleteUserProfileMaterial(@Valid @RequestBody request: IdQo<Int>): Tips =
         userService.deleteUserProfileMaterial(request.id)
+        
+    @PostMapping("department/create")
+    @OperationLog(operation = Operation.USER_DEPARTMENT)
+    suspend fun createUserDepartment(@Valid @RequestBody request: UserDepartmentAddQo): Tips =
+        userService.createUserDepartment(request)
+
+    @PostMapping("department/update")
+    @OperationLog(operation = Operation.USER_DEPARTMENT)
+    suspend fun updateUserDepartment(@Valid @RequestBody request: UserDepartmentUpdateQo): Tips =
+        userService.updateUserDepartment(request)
 
     @PostMapping("delete")
     @OperationLog(operation = Operation.DELETE)
