@@ -14,7 +14,9 @@
 
 ### Changed
 
-- `spring.mail.propertie`s属性使用`[]`方式设置
+- `spring.mail.propertie`s属性使用`[]`方式设置；
+- 更改`sys_department`和`sys_user_department_ref`表结构使之更合理；
+- 删除所有表`deleted`字段，去除软删除逻辑；
 
 ## [1.0.1] - 2026-08-26
 

@@ -19,6 +19,7 @@ interface UserDepartmentRefRepository : CoroutineCrudRepository<UserDepartmentRe
     from sys_user_department_ref as ud
     inner join sys_department as d on ud.department_id = d.id
     where ud.user_id = :userId
+    order by d.sort_order asc, d.id asc
     """)
     fun getDepartmentByUserId(@Param("userId") userId: Int): Flow<DepartmentDo>
 }

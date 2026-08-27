@@ -140,10 +140,18 @@ data class UserRoleRefDo(
  */
 @Table("sys_user_department_ref")
 data class UserDepartmentRefDo(
-    @Id 
-    val id: Int?, 
-    val userId: Int, 
-    val departmentId: Int
+    @Id val id: Int?,
+    val userId: Int,
+    val departmentId: Int,
+    val positionId: Int? = null,
+    val primaryAssignment: Boolean? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val enabled: Boolean? = null,
+    val creator: String? = null,
+    val createTime: LocalDateTime? = null,
+    val updater: String? = null,
+    val updateTime: LocalDateTime? = null
 )
 
 /**

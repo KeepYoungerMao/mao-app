@@ -459,37 +459,68 @@ DROP TABLE IF EXISTS sys_company;
 DROP TABLE IF EXISTS sys_department;
 CREATE TABLE sys_department (
     id SERIAL PRIMARY KEY,
-    pid INTEGER NOT NULL,
+    parent_id INTEGER,
+    department_code VARCHAR(20) NOT NULL,
     department_name VARCHAR(100) NOT NULL,
     description VARCHAR(300),
+    department_type INTEGER,
+    member_assignable BOOLEAN NOT NULL DEFAULT TRUE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    status INTEGER NOT NULL DEFAULT 1,
     creator VARCHAR(20),
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
     update_time TIMESTAMP(3),
-    CONSTRAINT uk_department_name UNIQUE (department_name)
+    CONSTRAINT uk_department_code UNIQUE (department_code),
+    CONSTRAINT uk_department_parent_name UNIQUE (parent_id, department_name)
 );
 COMMENT ON TABLE sys_department IS '部门表';
 COMMENT ON COLUMN sys_department.id IS '主键';
-COMMENT ON COLUMN sys_department.pid IS '父类id';
+COMMENT ON COLUMN sys_department.parent_id IS '父部门id';
+COMMENT ON COLUMN sys_department.department_code IS '部门编号';
 COMMENT ON COLUMN sys_department.department_name IS '部门名称';
-COMMENT ON COLUMN sys_department.description IS '描述';
+COMMENT ON COLUMN sys_department.description IS '部门描述';
+COMMENT ON COLUMN sys_department.department_type IS '部门类型';
+COMMENT ON COLUMN sys_department.member_assignable IS '是否可分配成员';
+COMMENT ON COLUMN sys_department.sort_order IS '排序号';
+COMMENT ON COLUMN sys_department.status IS '状态.0=禁用;1=启用;2=归档';
 COMMENT ON COLUMN sys_department.creator IS '创建用户';
 COMMENT ON COLUMN sys_department.create_time IS '创建时间';
 COMMENT ON COLUMN sys_department.updater IS '更新用户';
 COMMENT ON COLUMN sys_department.update_time IS '更新时间';
-CREATE INDEX idx_department_pid ON sys_department (pid);
+CREATE INDEX idx_department_parent_id ON sys_department (parent_id);
 
 -- 用户-部门关系表
 DROP TABLE IF EXISTS sys_user_department_ref;
 CREATE TABLE sys_user_department_ref (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    department_id INTEGER NOT NULL
+    department_id INTEGER NOT NULL,
+    position_id INTEGER,
+    primary_assignment BOOLEAN NOT NULL DEFAULT FALSE,
+    start_date DATE,
+    end_date DATE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    creator VARCHAR(20),
+    create_time TIMESTAMP(3),
+    updater VARCHAR(20),
+    update_time TIMESTAMP(3)
 );
 COMMENT ON TABLE sys_user_department_ref IS '用户-部门关系表';
 COMMENT ON COLUMN sys_user_department_ref.id IS '主键';
 COMMENT ON COLUMN sys_user_department_ref.user_id IS '用户id';
 COMMENT ON COLUMN sys_user_department_ref.department_id IS '部门id';
+COMMENT ON COLUMN sys_user_department_ref.position_id IS '职位id';
+COMMENT ON COLUMN sys_user_department_ref.primary_assignment IS '是否主职.0=否;1=是';
+COMMENT ON COLUMN sys_user_department_ref.start_date IS '开始日期';
+COMMENT ON COLUMN sys_user_department_ref.end_date IS '结束日期';
+COMMENT ON COLUMN sys_user_department_ref.enabled IS '是否启用.0=否;1=是';
+COMMENT ON COLUMN sys_user_department_ref.creator IS '创建用户';
+COMMENT ON COLUMN sys_user_department_ref.create_time IS '创建时间';
+COMMENT ON COLUMN sys_user_department_ref.updater IS '更新用户';
+COMMENT ON COLUMN sys_user_department_ref.update_time IS '更新时间';
+CREATE INDEX idx_user_department_user_id ON sys_user_department_ref (user_id);
+CREATE INDEX idx_user_department_department_id ON sys_user_department_ref (department_id);
 
 
 -- ------------------------------------------------
