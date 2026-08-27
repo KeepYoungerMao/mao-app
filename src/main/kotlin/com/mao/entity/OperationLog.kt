@@ -14,8 +14,15 @@ enum class OperationScope { SYSTEM, DATA }
  */
 enum class OperationModule(val scope: OperationScope) {
     USER(OperationScope.SYSTEM), 
-    USER_PROFILE(OperationScope.SYSTEM), 
+    USER_PROFILE(OperationScope.SYSTEM),
+    USER_PROFILE_EDUCATION(OperationScope.SYSTEM),
+    USER_PROFILE_WORK(OperationScope.SYSTEM),
+    USER_PROFILE_RELATIONSHIP(OperationScope.SYSTEM),
+    USER_PROFILE_MATERIAL(OperationScope.SYSTEM),
+    USER_ROLE(OperationScope.SYSTEM),
+    USER_DEPARTMENT(OperationScope.SYSTEM),
     ROLE(OperationScope.SYSTEM),
+    ROLE_PERMISSION(OperationScope.SYSTEM),
     PERMISSION(OperationScope.SYSTEM), 
     OPERATION_LOG(OperationScope.SYSTEM), 
     DICT(OperationScope.SYSTEM),
@@ -48,9 +55,6 @@ enum class Operation {
     USER_RENEWAL,
     USER_LOCKED, 
     USER_ENABLED,
-    USER_ROLE, 
-    USER_DEPARTMENT,
-    ROLE_PERMISSION, 
     
     UNSET
 }

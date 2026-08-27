@@ -249,93 +249,6 @@ class UserService(
         return Tips("角色更新成功")
     }
 
-    /**
-     * 新增用户部门关联
-     */
-    @Transactional
-    suspend fun createUserDepartment(request: UserDepartmentAddQo): Tips {
-        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
-        val departmentId = request.departmentId ?: throw AppException(ErrorCode.BAD_REQUEST)
-        // 用户排他锁，检验用户是否存在，同时避免并发操作导致的脏数据
-        userRepository.findByIdForUpdate(userId) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
-        // 检验部门是否存在
-        val department = departmentRepository.findById(departmentId)
-            ?: throw AppException(ErrorCode.BAD_REQUEST, "部门不存在")
-        // 检验部门是否允许分配成员
-        if (department.memberAssignable != true) {
-            throw AppException(ErrorCode.BAD_REQUEST, "该部门不允许分配成员")
-        }
-        // 检验日期是否合法
-        validateDepartmentDate(request.startDate, request.endDate)
-        // 检验用户是否已关联该部门
-        if (userDepartmentRefRepository.findByUserIdAndDepartmentId(userId, departmentId) != null) {
-            throw AppException(ErrorCode.BAD_REQUEST, "用户已关联该部门")
-        }
-        // 如果新增的是主职，先清除该用户已有部门的主职状态
-        if (request.primaryAssignment == true) {
-            userDepartmentRefRepository.clearPrimaryAssignment(userId)
-        }
-        // 保存数据
-        userDepartmentRefRepository.save(
-            UserDepartmentRefDo(
-                id = null,
-                userId = userId,
-                departmentId = departmentId,
-                positionId = request.positionId,
-                primaryAssignment = request.primaryAssignment,
-                startDate = request.startDate,
-                endDate = request.endDate,
-                enabled = true, // 新增时默认启用
-            )
-        )
-        return Tips("用户部门关联创建成功")
-    }
-
-    /** 更新基础字段、主职状态或启用状态。 */
-    @Transactional
-    suspend fun updateUserDepartment(request: UserDepartmentUpdateQo): Tips {
-        val id = request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
-        // 查询当前关联数据
-        val current = userDepartmentRefRepository.findById(id) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
-        // 用户排他锁，检验用户是否存在，同时避免并发操作导致的脏数据
-        userRepository.findByIdForUpdate(current.userId) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
-        // 检验日期是否合法
-        if (request.startDate != null) {
-            current.startDate = request.startDate
-        }
-        if (request.endDate != null) {
-            current.endDate = request.endDate
-        }
-        validateDepartmentDate(current.startDate, current.endDate)
-        // 检验职务ID
-        if (request.positionId != null) {
-            current.positionId = request.positionId
-        }
-        // 处理主职状态
-        if (request.primaryAssignment != null) {
-            current.primaryAssignment = request.primaryAssignment
-            if (request.primaryAssignment) {
-                userDepartmentRefRepository.clearPrimaryAssignment(current.userId)
-            }
-        }
-        // 处理启用状态
-        if (request.enabled != null) {
-            current.enabled = request.enabled
-            if (current.enabled == false && userDepartmentRefRepository.countByUserIdAndEnabled(current.userId, true) <= 1L) {
-                throw AppException(ErrorCode.BAD_REQUEST, "用户至少需要一个启用的关联部门")
-            }
-        }
-        // 保存数据
-        userDepartmentRefRepository.save(current)
-        return Tips("用户部门关联更新成功")
-    }
-
-    private fun validateDepartmentDate(startDate: LocalDate?, endDate: LocalDate?) {
-        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
-            throw AppException(ErrorCode.BAD_REQUEST, "结束日期不能早于开始日期")
-        }
-    }
-
     suspend fun updateUserProfile(userProfileUpdate: UserProfileUpdateQo): UserProfileVo {
         val id = userProfileUpdate.id ?: throw AppException(ErrorCode.BAD_REQUEST)
         val userProfile = userProfileRepository.findById(id) ?: throw AppException(ErrorCode.BAD_REQUEST)
@@ -482,6 +395,93 @@ class UserService(
         userProfileMaterialRepository.findById(materialId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
         userProfileMaterialRepository.deleteById(materialId)
         return Tips("数据删除成功")
+    }
+
+    /**
+     * 新增用户部门关联
+     */
+    @Transactional
+    suspend fun createUserDepartment(request: UserDepartmentAddQo): Tips {
+        val userId = request.userId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val departmentId = request.departmentId ?: throw AppException(ErrorCode.BAD_REQUEST)
+        // 用户排他锁，检验用户是否存在，同时避免并发操作导致的脏数据
+        userRepository.findByIdForUpdate(userId) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
+        // 检验部门是否存在
+        val department = departmentRepository.findById(departmentId)
+            ?: throw AppException(ErrorCode.BAD_REQUEST, "部门不存在")
+        // 检验部门是否允许分配成员
+        if (department.memberAssignable != true) {
+            throw AppException(ErrorCode.BAD_REQUEST, "该部门不允许分配成员")
+        }
+        // 检验日期是否合法
+        validateDepartmentDate(request.startDate, request.endDate)
+        // 检验用户是否已关联该部门
+        if (userDepartmentRefRepository.findByUserIdAndDepartmentId(userId, departmentId) != null) {
+            throw AppException(ErrorCode.BAD_REQUEST, "用户已关联该部门")
+        }
+        // 如果新增的是主职，先清除该用户已有部门的主职状态
+        if (request.primaryAssignment == true) {
+            userDepartmentRefRepository.clearPrimaryAssignment(userId)
+        }
+        // 保存数据
+        userDepartmentRefRepository.save(
+            UserDepartmentRefDo(
+                id = null,
+                userId = userId,
+                departmentId = departmentId,
+                positionId = request.positionId,
+                primaryAssignment = request.primaryAssignment,
+                startDate = request.startDate,
+                endDate = request.endDate,
+                enabled = true, // 新增时默认启用
+            )
+        )
+        return Tips("用户部门关联创建成功")
+    }
+
+    /** 更新基础字段、主职状态或启用状态。 */
+    @Transactional
+    suspend fun updateUserDepartment(request: UserDepartmentUpdateQo): Tips {
+        val id = request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        // 查询当前关联数据
+        val current = userDepartmentRefRepository.findById(id) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        // 用户排他锁，检验用户是否存在，同时避免并发操作导致的脏数据
+        userRepository.findByIdForUpdate(current.userId) ?: throw AppException(ErrorCode.USER_NOT_FOUND)
+        // 检验日期是否合法
+        if (request.startDate != null) {
+            current.startDate = request.startDate
+        }
+        if (request.endDate != null) {
+            current.endDate = request.endDate
+        }
+        validateDepartmentDate(current.startDate, current.endDate)
+        // 检验职务ID
+        if (request.positionId != null) {
+            current.positionId = request.positionId
+        }
+        // 处理主职状态
+        if (request.primaryAssignment != null) {
+            current.primaryAssignment = request.primaryAssignment
+            if (request.primaryAssignment) {
+                userDepartmentRefRepository.clearPrimaryAssignment(current.userId)
+            }
+        }
+        // 处理启用状态
+        if (request.enabled != null) {
+            current.enabled = request.enabled
+            if (current.enabled == false && userDepartmentRefRepository.countByUserIdAndEnabled(current.userId, true) <= 1L) {
+                throw AppException(ErrorCode.BAD_REQUEST, "用户至少需要一个启用的关联部门")
+            }
+        }
+        // 保存数据
+        userDepartmentRefRepository.save(current)
+        return Tips("用户部门关联更新成功")
+    }
+
+    private fun validateDepartmentDate(startDate: LocalDate?, endDate: LocalDate?) {
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            throw AppException(ErrorCode.BAD_REQUEST, "结束日期不能早于开始日期")
+        }
     }
 
     /**
