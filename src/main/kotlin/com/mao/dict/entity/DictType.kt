@@ -1,0 +1,7 @@
+package com.mao.dict.entity
+
+enum class DictType(val id: Int) {
+    SEX(1), NATION(2), MARITAL(3), COUNTRY(4), POLITICAL(5), EDUCATION(6),
+    RELATIONSHIP(7), COMPANY_TYPE(8), BUSINESS_CONDITION(9), ANCIENT_BOOK_TYPE(10),
+    DYNASTY(11), BOOK_STATUS(12), LIVE_TYPE(13)
+}

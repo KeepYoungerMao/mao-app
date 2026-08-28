@@ -1,10 +1,10 @@
 package com.mao
 
-import com.mao.entity.UserAddQo
-import com.mao.extension.IdCard
-import com.mao.mapper.UserCreateMapper
-import com.mao.mapper.UserProfileCreateMapper
-import com.mao.util.RsaUtils
+import com.mao.user.entity.UserAddQo
+import com.mao.user.mapper.UserCreateMapper
+import com.mao.user.mapper.UserProfileCreateMapper
+import com.mao.common.util.RsaUtils
+import com.mao.common.validate.IdCard
 import jakarta.validation.Validation
 import jakarta.validation.Validator
 import org.junit.jupiter.api.Test
