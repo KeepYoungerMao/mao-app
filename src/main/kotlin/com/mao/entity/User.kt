@@ -1,6 +1,7 @@
 package com.mao.entity
 
-import com.mao.extension.*
+import com.mao.extension.QueryField
+import com.mao.extension.validate.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
@@ -16,7 +17,8 @@ import java.time.LocalDateTime
  */
 @Table("sys_user")
 data class UserDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var username: String? = null,
     var password: String? = null,
     var avatar: String? = null,
@@ -35,7 +37,8 @@ data class UserDo(
  */
 @Table("sys_user_profile")
 data class UserProfileDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var userId: Int? = null,
     var userCode: String? = null,
     var realName: String? = null,
@@ -70,7 +73,8 @@ data class UserProfileDo(
  */
 @Table("sys_user_profile_education")
 data class UserProfileEducationDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var userId: Int? = null,
     var institutionName: String? = null,
     var degree: String? = null,
@@ -85,7 +89,8 @@ data class UserProfileEducationDo(
  */
 @Table("sys_user_profile_work")
 data class UserProfileWorkDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var userId: Int? = null,
     var companyName: String? = null,
     var jobTitle: String? = null,
@@ -102,7 +107,8 @@ data class UserProfileWorkDo(
  */
 @Table("sys_user_profile_relationship")
 data class UserProfileRelationshipDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var userId: Int? = null,
     var realName: String? = null,
     var relationshipId: Int? = null,
@@ -116,7 +122,8 @@ data class UserProfileRelationshipDo(
  */
 @Table("sys_user_profile_material")
 data class UserProfileMaterialDo(
-    @Id var id: Int? = null,
+    @Id
+    var id: Int? = null,
     var userId: Int? = null,
     var materialName: String? = null,
     var filePath: String? = null,
@@ -140,7 +147,8 @@ data class UserRoleRefDo(
  */
 @Table("sys_user_department_ref")
 data class UserDepartmentRefDo(
-    @Id val id: Int?,
+    @Id
+    val id: Int?,
     val userId: Int,
     val departmentId: Int,
     var positionId: Int? = null,
@@ -307,17 +315,17 @@ data class UserDetailVo(
  * 用户查询参数类
  */
 data class UserQo(
-    @QueryField(type = QueryField.Type.LIKE) 
+    @QueryField(type = QueryField.Type.LIKE)
     val username: String? = null,
-    @QueryField(type = QueryField.Type.LIKE) 
+    @QueryField(type = QueryField.Type.LIKE)
     val phone: String? = null,
-    @QueryField(type = QueryField.Type.LIKE) 
+    @QueryField(type = QueryField.Type.LIKE)
     val email: String? = null,
-    @QueryField 
+    @QueryField
     val expired: Boolean? = null, 
-    @QueryField 
+    @QueryField
     val locked: Boolean? = null,
-    @QueryField 
+    @QueryField
     val enabled: Boolean? = null, 
     val roleId: Int? = null, 
     val departmentId: Int? = null
