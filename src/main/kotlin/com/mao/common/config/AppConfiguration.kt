@@ -8,7 +8,7 @@ import com.mao.dict.cache.LocalDictCache
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
 import com.mao.dict.repository.IndustryRepository
-import com.mao.dict.repository.ProvinceCityDistrictRepository
+import com.mao.dict.repository.RegionRepository
 import io.micrometer.context.ContextRegistry
 import jakarta.annotation.PostConstruct
 import org.slf4j.MDC
@@ -145,7 +145,7 @@ class AppConfiguration {
     @Bean
     fun localDictCache(dictTypeRepository: DictTypeRepository,
                        dictItemRepository: DictItemRepository,
-                       regionRepository: ProvinceCityDistrictRepository,
+                       regionRepository: RegionRepository,
                        industryRepository: IndustryRepository) : DictCache {
         return LocalDictCache(dictTypeRepository, dictItemRepository, regionRepository, industryRepository)
     }

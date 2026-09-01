@@ -1,7 +1,7 @@
 package com.mao.user.entity
 
 import com.mao.common.validate.DictField
-import com.mao.common.validate.ProvinceCityDistrict
+import com.mao.common.validate.RegionField
 import com.mao.dict.entity.RegionType
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
@@ -17,11 +17,11 @@ data class UserProfileUpdateQo(
     val bloodTypeId: Int? = null,
     val high: Double? = null,
     val weight: Double? = null,
-    @field:ProvinceCityDistrict(type = RegionType.PROVINCE)
+    @field:RegionField(type = RegionType.PROVINCE)
     val provinceId: Int? = null,
-    @field:ProvinceCityDistrict(type = RegionType.CITY)
+    @field:RegionField(type = RegionType.CITY)
     val cityId: Int? = null,
-    @field:ProvinceCityDistrict(type = RegionType.DISTRICT)
+    @field:RegionField(type = RegionType.DISTRICT)
     val districtId: Int? = null,
     val address: String? = null,
     val birthday: LocalDate? = null,
@@ -36,11 +36,11 @@ data class UserProfileUpdateQo(
     @field:DictField("EDUCATION")
     val educationId: Int? = null,
     val major: String? = null,
-    @field:ProvinceCityDistrict(type = RegionType.PROVINCE)
+    @field:RegionField(type = RegionType.PROVINCE)
     val originProvinceId: Int? = null,
-    @field:ProvinceCityDistrict(type = RegionType.CITY)
+    @field:RegionField(type = RegionType.CITY)
     val originCityId: Int? = null,
-    @field:ProvinceCityDistrict(type = RegionType.DISTRICT)
+    @field:RegionField(type = RegionType.DISTRICT)
     val originDistrictId: Int? = null,
     val originAddress: String? = null,
     val familyPhone: String? = null,

@@ -35,8 +35,8 @@ CREATE TABLE `sys_dict_item`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 省市区字典
-DROP TABLE IF EXISTS `sys_province_city_district`;
-CREATE TABLE `sys_province_city_district`
+DROP TABLE IF EXISTS `sys_region`;
+CREATE TABLE `sys_region`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `pid` INT NOT NULL COMMENT '父主键',

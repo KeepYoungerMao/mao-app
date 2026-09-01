@@ -8,13 +8,13 @@ import jakarta.validation.ConstraintValidatorContext
 /**
  * 省市区校验器
  */
-class ProvinceCityDistrictValidator(
+class RegionValidator(
     private val dictCache: DictCache,
-) : ConstraintValidator<ProvinceCityDistrict, Int> {
+) : ConstraintValidator<RegionField, Int> {
 
     private lateinit var regionType: RegionType
 
-    override fun initialize(annotation: ProvinceCityDistrict) {
+    override fun initialize(annotation: RegionField) {
         regionType = annotation.type
     }
 

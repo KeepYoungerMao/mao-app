@@ -24,7 +24,7 @@ class DictController(private val dictService: DictService) {
 
     @PostMapping("region/tree")
     @OperationLog(operation = Operation.ALL)
-    suspend fun searchRegionTree(): List<ProvinceCityDistrictVo> = dictService.searchRegionTree()
+    suspend fun searchRegionTree(): List<RegionVo> = dictService.searchRegionTree()
 
     @PostMapping("industry/tree")
     @OperationLog(operation = Operation.ALL)

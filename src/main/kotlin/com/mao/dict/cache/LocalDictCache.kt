@@ -6,7 +6,7 @@ import com.mao.dict.mapper.DictItemViewMapper
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
 import com.mao.dict.repository.IndustryRepository
-import com.mao.dict.repository.ProvinceCityDistrictRepository
+import com.mao.dict.repository.RegionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,7 +33,7 @@ import org.springframework.context.event.EventListener
 class LocalDictCache(
     private val dictTypeRepository: DictTypeRepository,
     private val dictItemRepository: DictItemRepository,
-    private val regionRepository: ProvinceCityDistrictRepository,
+    private val regionRepository: RegionRepository,
     private val industryRepository: IndustryRepository
 ) : DictCache {
 
@@ -145,7 +145,7 @@ class LocalDictCache(
     /**
      * 省市区为固定数据，直接返回初始化完成的树快照
      */
-    override suspend fun getProvinceCityDistrictTree(): List<ProvinceCityDistrictVo> {
+    override suspend fun getProvinceCityDistrictTree(): List<RegionVo> {
         return getRegionSnapshot().tree
     }
 
@@ -269,13 +269,13 @@ class LocalDictCache(
      */
     private suspend fun loadRegionSnapshot(): RegionSnapshot {
         val nodes = regionRepository.findAll().toList()
-            .sortedBy(ProvinceCityDistrictDo::id)
-            .map { ProvinceCityDistrictVo(it.id, it.pid, it.code, it.name) }
+            .sortedBy(RegionDo::id)
+            .map { RegionVo(it.id, it.pid, it.code, it.name) }
         val tree = TreeUtils.buildTree(nodes)
         val types = mutableMapOf<Int, RegionType>()
 
         // 根节点为省，第二层为市，第三层为区县；递归遍历时同步记录每个 ID 的类型。
-        fun index(nodesAtLevel: List<ProvinceCityDistrictVo>, level: Int) {
+        fun index(nodesAtLevel: List<RegionVo>, level: Int) {
             val type = RegionType.entries.getOrNull(level)
                 ?: error("省市区数据层级不能超过三级")
             nodesAtLevel.forEach { node ->
@@ -349,7 +349,7 @@ class LocalDictCache(
      * 省市区树及其“ID -> 行政区域层级”校验索引。
      */
     private data class RegionSnapshot(
-        val tree: List<ProvinceCityDistrictVo>,
+        val tree: List<RegionVo>,
         val types: Map<Int, RegionType>
     )
 

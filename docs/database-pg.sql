@@ -55,8 +55,8 @@ COMMENT ON COLUMN sys_dict_item.update_time IS '更新时间';
 
 
 -- 省市区字典表
-DROP TABLE IF EXISTS sys_province_city_district;
-CREATE TABLE sys_province_city_district (
+DROP TABLE IF EXISTS sys_region;
+CREATE TABLE sys_region (
     id SERIAL PRIMARY KEY,
     pid INTEGER NOT NULL,
     code VARCHAR(100) NOT NULL,
@@ -66,15 +66,15 @@ CREATE TABLE sys_province_city_district (
     updater VARCHAR(20),
     update_time TIMESTAMP(3)
 );
-COMMENT ON TABLE sys_province_city_district IS '省市区字典表';
-COMMENT ON COLUMN sys_province_city_district.id IS '主键';
-COMMENT ON COLUMN sys_province_city_district.pid IS '父主键';
-COMMENT ON COLUMN sys_province_city_district.code IS '编码';
-COMMENT ON COLUMN sys_province_city_district.name IS '名称';
-COMMENT ON COLUMN sys_province_city_district.creator IS '创建用户';
-COMMENT ON COLUMN sys_province_city_district.create_time IS '创建时间';
-COMMENT ON COLUMN sys_province_city_district.updater IS '更新用户';
-COMMENT ON COLUMN sys_province_city_district.update_time IS '更新时间';
+COMMENT ON TABLE sys_region IS '省市区字典表';
+COMMENT ON COLUMN sys_region.id IS '主键';
+COMMENT ON COLUMN sys_region.pid IS '父主键';
+COMMENT ON COLUMN sys_region.code IS '编码';
+COMMENT ON COLUMN sys_region.name IS '名称';
+COMMENT ON COLUMN sys_region.creator IS '创建用户';
+COMMENT ON COLUMN sys_region.create_time IS '创建时间';
+COMMENT ON COLUMN sys_region.updater IS '更新用户';
+COMMENT ON COLUMN sys_region.update_time IS '更新时间';
 
 -- 行业字典-2017版
 DROP TABLE IF EXISTS sys_industry_2017;

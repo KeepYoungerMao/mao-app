@@ -26,7 +26,7 @@ class DictService(
 
     suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictCache.getDictMap()
 
-    suspend fun searchRegionTree(): List<ProvinceCityDistrictVo> = dictCache.getProvinceCityDistrictTree()
+    suspend fun searchRegionTree(): List<RegionVo> = dictCache.getProvinceCityDistrictTree()
 
     suspend fun searchIndustryTree(): List<IndustryVo> = dictCache.getIndustryTree()
 

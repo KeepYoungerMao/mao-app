@@ -45,7 +45,7 @@ interface DictCache {
     /**
      * ## 获取所有省市区树结构数据
      */
-    suspend fun getProvinceCityDistrictTree() : List<ProvinceCityDistrictVo>
+    suspend fun getProvinceCityDistrictTree() : List<RegionVo>
 
     /**
      * ## 判断是否为正确的省市区数据ID

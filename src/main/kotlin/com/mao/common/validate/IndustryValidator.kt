@@ -9,7 +9,7 @@ import jakarta.validation.ConstraintValidatorContext
  */
 class IndustryValidator(
     private val dictCache: DictCache
-) : ConstraintValidator<Industry, Int> {
+) : ConstraintValidator<IndustryField, Int> {
     override fun isValid(value: Int?, context: ConstraintValidatorContext?): Boolean {
         // null值由@NotNull负责，此处放行
         if (value == null) return true

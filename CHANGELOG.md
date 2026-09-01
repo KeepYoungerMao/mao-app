@@ -10,7 +10,7 @@
 
 ### Added
 
-- 新增`additional-spring-configuration-metadata.json`；
+- 新增`additional-spring-configuration-metadata.json`不使用configuration-processor；
 - 新增用户关联部门API接口；
 
 ### Changed
@@ -20,6 +20,7 @@
 - 删除所有表`deleted`字段，去除软删除逻辑；
 - 对项目包结构做大调整，以业务模块划分包结构；对kotlin合并类文件拆分为单class文件；
 - 对字典缓存逻辑进行重新规划；
+- 省市区表重命名为：`sys_region`；
 
 ## [1.0.1] - 2026-08-26
 
