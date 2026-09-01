@@ -1,8 +1,14 @@
 package com.mao.common.config
 
 import com.mao.auth.cache.CaffeineUserAuthCache
-import com.mao.common.handler.GlobalResponseResultHandler
 import com.mao.auth.cache.UserAuthCache
+import com.mao.common.handler.GlobalResponseResultHandler
+import com.mao.dict.cache.DictCache
+import com.mao.dict.cache.LocalDictCache
+import com.mao.dict.repository.DictItemRepository
+import com.mao.dict.repository.DictTypeRepository
+import com.mao.dict.repository.IndustryRepository
+import com.mao.dict.repository.ProvinceCityDistrictRepository
 import io.micrometer.context.ContextRegistry
 import jakarta.annotation.PostConstruct
 import org.slf4j.MDC
@@ -123,7 +129,7 @@ class AppConfiguration {
     }
 
     /**
-     * 创建角色权限本地缓存
+     * 角色权限本地缓存
      */
     @Bean
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.ReactiveRedisConnectionFactory")
@@ -131,6 +137,17 @@ class AppConfiguration {
     fun localUserPermissionCache(jwtConfig: JwtConfig,
                                  reactiveUserDetailsService: ReactiveUserDetailsService) : UserAuthCache {
         return CaffeineUserAuthCache(jwtConfig, reactiveUserDetailsService)
+    }
+
+    /**
+     * 字典数据本地缓存
+     */
+    @Bean
+    fun localDictCache(dictTypeRepository: DictTypeRepository,
+                       dictItemRepository: DictItemRepository,
+                       regionRepository: ProvinceCityDistrictRepository,
+                       industryRepository: IndustryRepository) : DictCache {
+        return LocalDictCache(dictTypeRepository, dictItemRepository, regionRepository, industryRepository)
     }
 
     /**

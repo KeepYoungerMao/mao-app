@@ -86,7 +86,3 @@ object RsaUtils {
     }
 
 }
-
-fun main() {
-    RsaUtils.generatorRsa()
-}

@@ -53,11 +53,3 @@ object RandomUtils {
     }
 
 }
-
-fun main() {
-    println(RandomUtils.numbers(18))
-    println(RandomUtils.letters(18))
-    println(RandomUtils.chars(18))
-    println(RandomUtils.betterChars(18))
-    println(RandomUtils.sequence(18))
-}

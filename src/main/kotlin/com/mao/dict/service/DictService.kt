@@ -3,16 +3,11 @@ package com.mao.dict.service
 import com.mao.common.entity.ErrorCode
 import com.mao.common.entity.Tips
 import com.mao.common.ex.AppException
-import com.mao.common.util.TreeUtils
+import com.mao.dict.cache.DictCache
 import com.mao.dict.entity.*
+import com.mao.dict.mapper.DictItemViewMapper
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
-import com.mao.dict.repository.IndustryRepository
-import com.mao.dict.repository.ProvinceCityDistrictRepository
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.toList
-import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -26,68 +21,14 @@ import org.springframework.transaction.annotation.Transactional
 class DictService(
     private val dictTypeRepository: DictTypeRepository,
     private val dictItemRepository: DictItemRepository,
-    private val regionRepository: ProvinceCityDistrictRepository,
-    private val industryRepository: IndustryRepository,
+    private val dictCache: DictCache
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    @Volatile
-    private var dictCache: List<DictGroupVo>? = null
-    @Volatile
-    private var regionIds: Set<Int> = emptySet()
-    @Volatile
-    private var industryIds: Set<Int> = emptySet()
-    private val regionTree = CompletableDeferred<List<ProvinceCityDistrictVo>>()
-    private val industryTree = CompletableDeferred<List<IndustryVo>>()
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun preload() {
-        // 只加载一次并直接缓存最终树结构；接口调用只等待这两个永久快照。
-        scope.launch {
-            runCatching { getDictGroups() }
-            runCatching {
-                val regions = regionRepository.findAll().toList()
-                regionIds = regions.mapNotNull(ProvinceCityDistrictDo::id).toSet()
-                TreeUtils.buildTree(regions.map {
-                    ProvinceCityDistrictVo(it.id, it.pid, it.code, it.name)
-                })
-            }.onSuccess(regionTree::complete).onFailure(regionTree::completeExceptionally)
-            runCatching {
-                val industries = industryRepository.findAllByOrderByPidAscIdAsc().toList()
-                industryIds = industries.mapNotNull(IndustryDo::id).toSet()
-                TreeUtils.buildTree(industries.map {
-                    IndustryVo(it.id, it.pid, it.code, it.name, it.description)
-                })
-            }.onSuccess(industryTree::complete).onFailure(industryTree::completeExceptionally)
-        }
-    }
+    suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictCache.getDictMap()
 
-    private suspend fun getDictGroups(): List<DictGroupVo> {
-        dictCache?.let { return it }
-        val types = dictTypeRepository.findAll().toList()
-        val items = dictItemRepository.findAll().toList().filter { it.status != 0 }
-        return types.map { type ->
-            DictGroupVo(toTypeVo(type), items.filter { it.pid == type.id }.map(::toItemVo))
-        }.also { dictCache = it }
-    }
+    suspend fun searchRegionTree(): List<ProvinceCityDistrictVo> = dictCache.getProvinceCityDistrictTree()
 
-    suspend fun listDictGroups(): List<DictGroupVo> = getDictGroups()
-
-    suspend fun listProvinceCityDistrict(): List<ProvinceCityDistrictVo> = regionTree.await()
-
-    suspend fun listIndustry(): List<IndustryVo> = industryTree.await()
-
-    /**
-     * Bean Validation回调是同步接口，因此这里只读取启动时/写入后维护的内存快照，
-     * 不在WebFlux线程中阻塞等待协程或访问数据库。
-     */
-    fun isActiveItem(type: DictType, itemId: Int): Boolean =
-        dictCache?.any { group ->
-            group.type.id == type.id && group.items.any { it.id == itemId }
-        } == true
-
-    fun isProvinceCityDistrict(itemId: Int): Boolean = itemId in regionIds
-
-    fun isIndustry(itemId: Int): Boolean = itemId in industryIds
+    suspend fun searchIndustryTree(): List<IndustryVo> = dictCache.getIndustryTree()
 
     @Transactional
     suspend fun createItem(request: DictItemAddQo): DictItemVo {
@@ -102,10 +43,10 @@ class DictService(
         }
         // 数据保存
         val dictItem = dictItemRepository.save(DictItemDo(pid = pid, name = name, status = 1))
-        // 清空缓存
-        refreshDictCache()
+        // 更新缓存
+        dictCache.addOrUpdateDictItem(dictItem)
         // 返回结果
-        return toItemVo(dictItem)
+        return DictItemViewMapper.map(dictItem)
     }
 
     @Transactional
@@ -120,10 +61,10 @@ class DictService(
         }
         // 数据保存
         val dictItem = dictItemRepository.save(DictItemDo(id = id, pid = item.pid, name = name, status = item.status))
-        // 清空缓存
-        refreshDictCache()
+        // 更新缓存
+        dictCache.addOrUpdateDictItem(dictItem)
         // 返回结果
-        return toItemVo(dictItem)
+        return DictItemViewMapper.map(dictItem)
     }
 
     @Transactional
@@ -133,18 +74,9 @@ class DictService(
         // 数据保存
         item.status = 0
         dictItemRepository.save(item)
-        // 清空缓存
-        refreshDictCache()
+        // 更新缓存
+        dictCache.addOrUpdateDictItem(item)
         return Tips("数据禁用成功")
-    }
-
-    private fun toTypeVo(v: DictTypeDo) = DictTypeVo(v.id, v.name, v.description)
-
-    private fun toItemVo(v: DictItemDo) = DictItemVo(v.id, v.pid, v.name, v.status)
-
-    private suspend fun refreshDictCache() {
-        dictCache = null
-        getDictGroups()
     }
 
 }

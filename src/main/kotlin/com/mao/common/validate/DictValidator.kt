@@ -1,7 +1,6 @@
 package com.mao.common.validate
 
-import com.mao.dict.entity.DictType
-import com.mao.dict.service.DictService
+import com.mao.dict.cache.DictCache
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 
@@ -9,17 +8,18 @@ import jakarta.validation.ConstraintValidatorContext
  * 字典校验器
  */
 class DictValidator(
-    private val dictService: DictService,
-) : ConstraintValidator<Dict, Int> {
-    private lateinit var type: DictType
+    private val dictCache: DictCache
+) : ConstraintValidator<DictField, Int> {
 
-    override fun initialize(annotation: Dict) {
-        type = annotation.type
+    private lateinit var dictType: String
+
+    override fun initialize(annotation: DictField) {
+        dictType = annotation.name
     }
 
     override fun isValid(value: Int?, context: ConstraintValidatorContext?): Boolean {
         // null值由@NotNull/@NotBlank负责，此处放行
         if (value == null) return true
-        return dictService.isActiveItem(type, value)
+        return dictCache.isActiveDictItem(value, dictType)
     }
 }

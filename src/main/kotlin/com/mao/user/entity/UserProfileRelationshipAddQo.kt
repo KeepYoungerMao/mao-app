@@ -1,9 +1,8 @@
 package com.mao.user.entity
 
-import com.mao.common.validate.Dict
+import com.mao.common.validate.DictField
 import com.mao.common.validate.IdCard
 import com.mao.common.validate.Phone
-import com.mao.dict.entity.DictType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.hibernate.validator.constraints.Length
@@ -18,7 +17,7 @@ data class UserProfileRelationshipAddQo(
     @field:Length(max = 20)
     val realName: String? = null,
     @field:NotNull
-    @field:Dict(DictType.RELATIONSHIP)
+    @field:DictField("RELATIONSHIP")
     val relationshipId: Int? = null,
     @field:IdCard
     val idCardNum: String? = null,

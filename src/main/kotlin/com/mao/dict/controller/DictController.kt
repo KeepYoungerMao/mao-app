@@ -4,9 +4,9 @@ import com.mao.common.entity.IdQo
 import com.mao.common.entity.Tips
 import com.mao.common.handler.OperationLog
 import com.mao.dict.entity.*
+import com.mao.dict.service.DictService
 import com.mao.log.entity.Operation
 import com.mao.log.entity.OperationModule
-import com.mao.dict.service.DictService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,15 +20,15 @@ class DictController(private val dictService: DictService) {
 
     @PostMapping("all")
     @OperationLog(operation = Operation.ALL)
-    suspend fun groups(): List<DictGroupVo> = dictService.listDictGroups()
+    suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictService.searchAllDict()
 
     @PostMapping("region/tree")
     @OperationLog(operation = Operation.ALL)
-    suspend fun regionTree(): List<ProvinceCityDistrictVo> = dictService.listProvinceCityDistrict()
+    suspend fun searchRegionTree(): List<ProvinceCityDistrictVo> = dictService.searchRegionTree()
 
     @PostMapping("industry/tree")
     @OperationLog(operation = Operation.ALL)
-    suspend fun industryTree(): List<IndustryVo> = dictService.listIndustry()
+    suspend fun searchIndustryTree(): List<IndustryVo> = dictService.searchIndustryTree()
 
     @PostMapping("item/create")
     @OperationLog(operation = Operation.CREATE)
