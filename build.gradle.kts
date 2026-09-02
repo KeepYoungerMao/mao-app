@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.4.0"
     kotlin("plugin.spring") version "2.4.0"
+    kotlin("kapt") version "2.4.0"
     // mappie插件，插件版本号采用 {kotlin.version}-{mappie.version} 的结构，mappie版本前缀必须与kotlin版本保持一致
     id("tech.mappie.plugin") version "2.4.0-2.4.2"
     id("org.springframework.boot") version "4.1.0"
@@ -28,6 +29,7 @@ repositories {
 }
 
 dependencies {
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")

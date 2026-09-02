@@ -10,7 +10,7 @@
 
 ### Added
 
-- 新增`additional-spring-configuration-metadata.json`不使用configuration-processor；
+- 新增`spring-boot-configuration-processor`；
 - 新增用户关联部门API接口；
 
 ### Changed
