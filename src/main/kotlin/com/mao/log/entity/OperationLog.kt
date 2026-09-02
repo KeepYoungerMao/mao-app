@@ -27,6 +27,8 @@ enum class OperationModule(val scope: OperationScope) {
     PERMISSION(OperationScope.SYSTEM), 
     OPERATION_LOG(OperationScope.SYSTEM), 
     DICT(OperationScope.SYSTEM),
+    REGION(OperationScope.SYSTEM),
+    INDUSTRY(OperationScope.SYSTEM),
     DEPARTMENT(OperationScope.SYSTEM), 
     
     ANCIENT_BOOK(OperationScope.DATA), 

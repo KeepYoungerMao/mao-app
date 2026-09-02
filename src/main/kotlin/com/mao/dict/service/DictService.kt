@@ -4,7 +4,10 @@ import com.mao.common.entity.ErrorCode
 import com.mao.common.entity.Tips
 import com.mao.common.ex.AppException
 import com.mao.dict.cache.DictCache
-import com.mao.dict.entity.*
+import com.mao.dict.entity.DictItemAddQo
+import com.mao.dict.entity.DictItemDo
+import com.mao.dict.entity.DictItemUpdateQo
+import com.mao.dict.entity.DictItemVo
 import com.mao.dict.mapper.DictItemViewMapper
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
@@ -25,10 +28,6 @@ class DictService(
 ) {
 
     suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictCache.getDictMap()
-
-    suspend fun searchRegionTree(): List<RegionVo> = dictCache.getProvinceCityDistrictTree()
-
-    suspend fun searchIndustryTree(): List<IndustryVo> = dictCache.getIndustryTree()
 
     @Transactional
     suspend fun createItem(request: DictItemAddQo): DictItemVo {

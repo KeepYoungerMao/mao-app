@@ -3,7 +3,9 @@ package com.mao.dict.controller
 import com.mao.common.entity.IdQo
 import com.mao.common.entity.Tips
 import com.mao.common.handler.OperationLog
-import com.mao.dict.entity.*
+import com.mao.dict.entity.DictItemAddQo
+import com.mao.dict.entity.DictItemUpdateQo
+import com.mao.dict.entity.DictItemVo
 import com.mao.dict.service.DictService
 import com.mao.log.entity.Operation
 import com.mao.log.entity.OperationModule
@@ -18,17 +20,9 @@ import org.springframework.web.bind.annotation.RestController
 @OperationLog(module = OperationModule.DICT)
 class DictController(private val dictService: DictService) {
 
-    @PostMapping("all")
+    @PostMapping("tree")
     @OperationLog(operation = Operation.ALL)
     suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictService.searchAllDict()
-
-    @PostMapping("region/tree")
-    @OperationLog(operation = Operation.ALL)
-    suspend fun searchRegionTree(): List<RegionVo> = dictService.searchRegionTree()
-
-    @PostMapping("industry/tree")
-    @OperationLog(operation = Operation.ALL)
-    suspend fun searchIndustryTree(): List<IndustryVo> = dictService.searchIndustryTree()
 
     @PostMapping("item/create")
     @OperationLog(operation = Operation.CREATE)

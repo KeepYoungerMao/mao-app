@@ -1,0 +1,23 @@
+package com.mao.dict.controller
+
+import com.mao.common.handler.OperationLog
+import com.mao.dict.entity.RegionVo
+import com.mao.dict.service.RegionService
+import com.mao.log.entity.Operation
+import com.mao.log.entity.OperationModule
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/v1/region")
+@OperationLog(module = OperationModule.REGION)
+class RegionController(
+    private val regionService: RegionService
+) {
+
+    @PostMapping("tree")
+    @OperationLog(operation = Operation.ALL)
+    suspend fun searchRegionTree(): List<RegionVo> = regionService.searchRegionTree()
+
+}
