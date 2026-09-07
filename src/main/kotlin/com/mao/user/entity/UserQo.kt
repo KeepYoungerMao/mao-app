@@ -19,6 +19,5 @@ data class UserQo(
     val locked: Boolean? = null,
     @QueryField
     val enabled: Boolean? = null,
-    val roleId: Int? = null,
-    val departmentId: Int? = null
+    val roleId: Int? = null
 ) : PageQo()

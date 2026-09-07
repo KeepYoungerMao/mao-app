@@ -9,6 +9,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     ILLEGAL_PASSWORD(4001, "密码不合法"),
     ILLEGAL_EXPIRE_TIME(4002, "过期时间不合法"),
     DATA_NOT_FOUND(4003, "数据不存在"),
+    OPERATION_NOT_ALLOWED(4004, "不允许操作"),
 
     AUTHENTICATION_ERROR(4101, "认证错误，请联系管理员"),
     AUTHENTICATION_TIMEOUT(4102, "认证超时"),

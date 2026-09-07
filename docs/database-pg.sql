@@ -41,7 +41,8 @@ CREATE TABLE sys_dict_item (
    creator VARCHAR(20),
    create_time TIMESTAMP(3),
    updater VARCHAR(20),
-   update_time TIMESTAMP(3)
+   update_time TIMESTAMP(3),
+   CONSTRAINT uk_sys_dict_item_pid_name UNIQUE (pid, name)
 );
 COMMENT ON TABLE sys_dict_item IS '字典项表';
 COMMENT ON COLUMN sys_dict_item.id IS '主键';
@@ -94,8 +95,8 @@ COMMENT ON COLUMN sys_industry_2017.description IS '描述';
 
 -- 系统操作日志
 -- 操作日志表
-DROP TABLE IF EXISTS sys_operate_log;
-CREATE TABLE sys_operate_log (
+DROP TABLE IF EXISTS sys_operation_log;
+CREATE TABLE sys_operation_log (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
     scope VARCHAR(20) NOT NULL,
@@ -109,19 +110,19 @@ CREATE TABLE sys_operate_log (
     operation_time TIMESTAMP(3) NOT NULL,
     cost BIGINT NOT NULL DEFAULT 0
 );
-COMMENT ON TABLE sys_operate_log IS '操作日志表';
-COMMENT ON COLUMN sys_operate_log.id IS '主键';
-COMMENT ON COLUMN sys_operate_log.username IS '操作人';
-COMMENT ON COLUMN sys_operate_log.scope IS '操作域';
-COMMENT ON COLUMN sys_operate_log.module IS '操作模块';
-COMMENT ON COLUMN sys_operate_log.operation IS '操作项';
-COMMENT ON COLUMN sys_operate_log.description IS '操作描述';
-COMMENT ON COLUMN sys_operate_log.method IS 'HTTP METHOD';
-COMMENT ON COLUMN sys_operate_log.ip IS '操作人IP';
-COMMENT ON COLUMN sys_operate_log.success IS '是否成功';
-COMMENT ON COLUMN sys_operate_log.error_message IS '错误信息';
-COMMENT ON COLUMN sys_operate_log.operation_time IS '操作时间';
-COMMENT ON COLUMN sys_operate_log.cost IS '接口耗时';
+COMMENT ON TABLE sys_operation_log IS '操作日志表';
+COMMENT ON COLUMN sys_operation_log.id IS '主键';
+COMMENT ON COLUMN sys_operation_log.username IS '操作人';
+COMMENT ON COLUMN sys_operation_log.scope IS '操作域';
+COMMENT ON COLUMN sys_operation_log.module IS '操作模块';
+COMMENT ON COLUMN sys_operation_log.operation IS '操作项';
+COMMENT ON COLUMN sys_operation_log.description IS '操作描述';
+COMMENT ON COLUMN sys_operation_log.method IS 'HTTP METHOD';
+COMMENT ON COLUMN sys_operation_log.ip IS '操作人IP';
+COMMENT ON COLUMN sys_operation_log.success IS '是否成功';
+COMMENT ON COLUMN sys_operation_log.error_message IS '错误信息';
+COMMENT ON COLUMN sys_operation_log.operation_time IS '操作时间';
+COMMENT ON COLUMN sys_operation_log.cost IS '接口耗时';
 
 -- 系统服务指标
 DROP TABLE IF EXISTS sys_server_metric;
@@ -255,15 +256,16 @@ COMMENT ON COLUMN sys_role_permission_ref.id IS '主键';
 COMMENT ON COLUMN sys_role_permission_ref.role_id IS '角色id';
 COMMENT ON COLUMN sys_role_permission_ref.permission_id IS '权限id';
 
--- 用户资料信息表
-DROP TABLE IF EXISTS sys_user_profile;
-CREATE TABLE sys_user_profile (
+-- 用户资料信息
+-- 基本信息 sys_employee
+DROP TABLE IF EXISTS sys_employee;
+CREATE TABLE sys_employee (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    user_code VARCHAR(10) NOT NULL,
+    user_id INTEGER,
+    employee_code VARCHAR(10) NOT NULL,
     real_name VARCHAR(20) NOT NULL,
     sex_id INTEGER,
-    entry_time DATE,
+    entry_date DATE,
     id_card_num VARCHAR(18) NOT NULL,
     blood_type_id INTEGER,
     high DECIMAL(5,2),
@@ -291,48 +293,49 @@ CREATE TABLE sys_user_profile (
     updater VARCHAR(20),
     update_time TIMESTAMP(3)
 );
-COMMENT ON TABLE sys_user_profile IS '用户资料信息表';
-COMMENT ON COLUMN sys_user_profile.id IS '主键';
-COMMENT ON COLUMN sys_user_profile.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_profile.user_code IS '用户编号';
-COMMENT ON COLUMN sys_user_profile.real_name IS '姓名';
-COMMENT ON COLUMN sys_user_profile.sex_id IS '性别ID';
-COMMENT ON COLUMN sys_user_profile.entry_time IS '入职时间';
-COMMENT ON COLUMN sys_user_profile.id_card_num IS '身份证号';
-COMMENT ON COLUMN sys_user_profile.blood_type_id IS '血型ID';
-COMMENT ON COLUMN sys_user_profile.high IS '身高，单位CM';
-COMMENT ON COLUMN sys_user_profile.weight IS '体重，单位KG';
-COMMENT ON COLUMN sys_user_profile.province_id IS '省ID';
-COMMENT ON COLUMN sys_user_profile.city_id IS '市ID';
-COMMENT ON COLUMN sys_user_profile.district_id IS '区ID';
-COMMENT ON COLUMN sys_user_profile.address IS '详细地址';
-COMMENT ON COLUMN sys_user_profile.birthday IS '出生日期';
-COMMENT ON COLUMN sys_user_profile.nation_id IS '民族ID';
-COMMENT ON COLUMN sys_user_profile.country_id IS '国籍ID';
-COMMENT ON COLUMN sys_user_profile.marital_id IS '婚姻状况ID';
-COMMENT ON COLUMN sys_user_profile.political_id IS '政治面貌ID';
-COMMENT ON COLUMN sys_user_profile.education_id IS '学历ID';
-COMMENT ON COLUMN sys_user_profile.major IS '专业';
-COMMENT ON COLUMN sys_user_profile.origin_province_id IS '籍贯省ID';
-COMMENT ON COLUMN sys_user_profile.origin_city_id IS '籍贯市ID';
-COMMENT ON COLUMN sys_user_profile.origin_district_id IS '籍贯区ID';
-COMMENT ON COLUMN sys_user_profile.origin_address IS '籍贯详细地址';
-COMMENT ON COLUMN sys_user_profile.family_phone IS '家庭电话';
-COMMENT ON COLUMN sys_user_profile.hobby IS '兴趣爱好';
-COMMENT ON COLUMN sys_user_profile.remark IS '备注';
-COMMENT ON COLUMN sys_user_profile.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_profile.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_profile.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_profile.update_time IS '更新时间';
-CREATE INDEX idx_user_profile_user_id ON sys_user_profile (user_id);
-CREATE INDEX idx_user_profile_user_code ON sys_user_profile (user_code);
-CREATE INDEX idx_user_profile_id_card_num_trgm ON sys_user_profile USING GIN (id_card_num gin_trgm_ops);
+COMMENT ON TABLE sys_employee IS '用户资料信息';
+COMMENT ON COLUMN sys_employee.id IS '主键';
+COMMENT ON COLUMN sys_employee.user_id IS '用户id';
+COMMENT ON COLUMN sys_employee.employee_code IS '用户编号';
+COMMENT ON COLUMN sys_employee.real_name IS '姓名';
+COMMENT ON COLUMN sys_employee.sex_id IS '性别ID';
+COMMENT ON COLUMN sys_employee.entry_date IS '入职日期';
+COMMENT ON COLUMN sys_employee.id_card_num IS '身份证号';
+COMMENT ON COLUMN sys_employee.blood_type_id IS '血型ID';
+COMMENT ON COLUMN sys_employee.high IS '身高，单位CM';
+COMMENT ON COLUMN sys_employee.weight IS '体重，单位KG';
+COMMENT ON COLUMN sys_employee.province_id IS '省ID';
+COMMENT ON COLUMN sys_employee.city_id IS '市ID';
+COMMENT ON COLUMN sys_employee.district_id IS '区ID';
+COMMENT ON COLUMN sys_employee.address IS '详细地址';
+COMMENT ON COLUMN sys_employee.birthday IS '出生日期';
+COMMENT ON COLUMN sys_employee.nation_id IS '民族ID';
+COMMENT ON COLUMN sys_employee.country_id IS '国籍ID';
+COMMENT ON COLUMN sys_employee.marital_id IS '婚姻状况ID';
+COMMENT ON COLUMN sys_employee.political_id IS '政治面貌ID';
+COMMENT ON COLUMN sys_employee.education_id IS '学历ID';
+COMMENT ON COLUMN sys_employee.major IS '专业';
+COMMENT ON COLUMN sys_employee.origin_province_id IS '籍贯省ID';
+COMMENT ON COLUMN sys_employee.origin_city_id IS '籍贯市ID';
+COMMENT ON COLUMN sys_employee.origin_district_id IS '籍贯区ID';
+COMMENT ON COLUMN sys_employee.origin_address IS '籍贯详细地址';
+COMMENT ON COLUMN sys_employee.family_phone IS '家庭电话';
+COMMENT ON COLUMN sys_employee.hobby IS '兴趣爱好';
+COMMENT ON COLUMN sys_employee.remark IS '备注';
+COMMENT ON COLUMN sys_employee.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee.update_time IS '更新时间';
+SELECT setval('sys_employee_id_seq', 10000000, false);
+CREATE INDEX idx_employee_user_id ON sys_employee (user_id);
+CREATE INDEX idx_employee_code ON sys_employee (employee_code);
+CREATE INDEX idx_employee_id_card_num_trgm ON sys_employee USING GIN (id_card_num gin_trgm_ops);
 
--- 教育经历表
-DROP TABLE IF EXISTS sys_user_profile_education;
-CREATE TABLE sys_user_profile_education (
+-- 教育经历 sys_employee_education
+DROP TABLE IF EXISTS sys_employee_education;
+CREATE TABLE sys_employee_education (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
     institution_name VARCHAR(50) NOT NULL,
     degree VARCHAR(30),
     major VARCHAR(50),
@@ -343,28 +346,28 @@ CREATE TABLE sys_user_profile_education (
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
     update_time TIMESTAMP(3),
-    CONSTRAINT uk_user_education_unique UNIQUE (user_id, institution_name)
+    CONSTRAINT uk_employee_education_unique UNIQUE (employee_id, institution_name)
 );
-COMMENT ON TABLE sys_user_profile_education IS '教育经历表';
-COMMENT ON COLUMN sys_user_profile_education.id IS '主键';
-COMMENT ON COLUMN sys_user_profile_education.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_profile_education.institution_name IS '学校/教育机构名称';
-COMMENT ON COLUMN sys_user_profile_education.degree IS '获得的学位';
-COMMENT ON COLUMN sys_user_profile_education.major IS '专业名称';
-COMMENT ON COLUMN sys_user_profile_education.start_date IS '入学日期';
-COMMENT ON COLUMN sys_user_profile_education.end_date IS '毕业日期';
-COMMENT ON COLUMN sys_user_profile_education.additional_info IS '其他教育相关经历';
-COMMENT ON COLUMN sys_user_profile_education.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_profile_education.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_profile_education.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_profile_education.update_time IS '更新时间';
-CREATE INDEX idx_user_education_user_id ON sys_user_profile_education (user_id);
+COMMENT ON TABLE sys_employee_education IS '教育经历';
+COMMENT ON COLUMN sys_employee_education.id IS '主键';
+COMMENT ON COLUMN sys_employee_education.employee_id IS '用户id';
+COMMENT ON COLUMN sys_employee_education.institution_name IS '学校/教育机构名称';
+COMMENT ON COLUMN sys_employee_education.degree IS '获得的学位';
+COMMENT ON COLUMN sys_employee_education.major IS '专业名称';
+COMMENT ON COLUMN sys_employee_education.start_date IS '入学日期';
+COMMENT ON COLUMN sys_employee_education.end_date IS '毕业日期';
+COMMENT ON COLUMN sys_employee_education.additional_info IS '其他教育相关经历';
+COMMENT ON COLUMN sys_employee_education.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee_education.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee_education.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee_education.update_time IS '更新时间';
+CREATE INDEX idx_employee_education_employee_id ON sys_employee_education (employee_id);
 
--- 工作经历表
-DROP TABLE IF EXISTS sys_user_profile_work;
-CREATE TABLE sys_user_profile_work (
+-- 工作经历 sys_employee_work
+DROP TABLE IF EXISTS sys_employee_work;
+CREATE TABLE sys_employee_work (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
     company_name VARCHAR(50) NOT NULL,
     job_title VARCHAR(30),
     industry VARCHAR(50),
@@ -377,30 +380,30 @@ CREATE TABLE sys_user_profile_work (
     create_time TIMESTAMP(3),
     updater VARCHAR(20),
     update_time TIMESTAMP(3),
-    CONSTRAINT uk_user_work_unique UNIQUE (user_id, company_name)
+    CONSTRAINT uk_employee_work_unique UNIQUE (employee_id, company_name)
 );
-COMMENT ON TABLE sys_user_profile_work IS '工作经历表';
-COMMENT ON COLUMN sys_user_profile_work.id IS '主键';
-COMMENT ON COLUMN sys_user_profile_work.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_profile_work.company_name IS '公司/单位名称';
-COMMENT ON COLUMN sys_user_profile_work.job_title IS '职位名称';
-COMMENT ON COLUMN sys_user_profile_work.industry IS '所在行业';
-COMMENT ON COLUMN sys_user_profile_work.industry_id IS '所在行业ID';
-COMMENT ON COLUMN sys_user_profile_work.start_date IS '入职日期';
-COMMENT ON COLUMN sys_user_profile_work.end_date IS '离职日期';
-COMMENT ON COLUMN sys_user_profile_work.responsibilities IS '工作职责和主要成就';
-COMMENT ON COLUMN sys_user_profile_work.current_employment IS '是否在职（true=在职，false=已离职）';
-COMMENT ON COLUMN sys_user_profile_work.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_profile_work.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_profile_work.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_profile_work.update_time IS '更新时间';
-CREATE INDEX idx_user_work_user_id ON sys_user_profile_work (user_id);
+COMMENT ON TABLE sys_employee_work IS '工作经历';
+COMMENT ON COLUMN sys_employee_work.id IS '主键';
+COMMENT ON COLUMN sys_employee_work.employee_id IS '用户id';
+COMMENT ON COLUMN sys_employee_work.company_name IS '公司/单位名称';
+COMMENT ON COLUMN sys_employee_work.job_title IS '职位名称';
+COMMENT ON COLUMN sys_employee_work.industry IS '所在行业';
+COMMENT ON COLUMN sys_employee_work.industry_id IS '所在行业ID';
+COMMENT ON COLUMN sys_employee_work.start_date IS '入职日期';
+COMMENT ON COLUMN sys_employee_work.end_date IS '离职日期';
+COMMENT ON COLUMN sys_employee_work.responsibilities IS '工作职责和主要成就';
+COMMENT ON COLUMN sys_employee_work.current_employment IS '是否在职（true=在职，false=已离职）';
+COMMENT ON COLUMN sys_employee_work.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee_work.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee_work.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee_work.update_time IS '更新时间';
+CREATE INDEX idx_employee_work_employee_id ON sys_employee_work (employee_id);
 
--- 人员关系表
-DROP TABLE IF EXISTS sys_user_profile_relationship;
-CREATE TABLE sys_user_profile_relationship (
+-- 人员关系 sys_employee_relationship
+DROP TABLE IF EXISTS sys_employee_relationship;
+CREATE TABLE sys_employee_relationship (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
     real_name VARCHAR(20) NOT NULL,
     relationship_id INTEGER NOT NULL,
     id_card_num VARCHAR(18),
@@ -411,25 +414,25 @@ CREATE TABLE sys_user_profile_relationship (
     updater VARCHAR(20),
     update_time TIMESTAMP(3)
 );
-COMMENT ON TABLE sys_user_profile_relationship IS '人员关系表';
-COMMENT ON COLUMN sys_user_profile_relationship.id IS '主键';
-COMMENT ON COLUMN sys_user_profile_relationship.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_profile_relationship.real_name IS '姓名';
-COMMENT ON COLUMN sys_user_profile_relationship.relationship_id IS '人员关系ID（关联字典表）';
-COMMENT ON COLUMN sys_user_profile_relationship.id_card_num IS '身份证号';
-COMMENT ON COLUMN sys_user_profile_relationship.phone IS '联系方式';
-COMMENT ON COLUMN sys_user_profile_relationship.remark IS '备注';
-COMMENT ON COLUMN sys_user_profile_relationship.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_profile_relationship.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_profile_relationship.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_profile_relationship.update_time IS '更新时间';
-CREATE INDEX idx_user_relationship_user_id ON sys_user_profile_relationship (user_id);
+COMMENT ON TABLE sys_employee_relationship IS '人员关系';
+COMMENT ON COLUMN sys_employee_relationship.id IS '主键';
+COMMENT ON COLUMN sys_employee_relationship.employee_id IS '用户id';
+COMMENT ON COLUMN sys_employee_relationship.real_name IS '姓名';
+COMMENT ON COLUMN sys_employee_relationship.relationship_id IS '人员关系ID';
+COMMENT ON COLUMN sys_employee_relationship.id_card_num IS '身份证号';
+COMMENT ON COLUMN sys_employee_relationship.phone IS '联系方式';
+COMMENT ON COLUMN sys_employee_relationship.remark IS '备注';
+COMMENT ON COLUMN sys_employee_relationship.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee_relationship.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee_relationship.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee_relationship.update_time IS '更新时间';
+CREATE INDEX idx_employee_relationship_employee_id ON sys_employee_relationship (employee_id);
 
--- 补充材料表
-DROP TABLE IF EXISTS sys_user_profile_material;
-CREATE TABLE sys_user_profile_material (
+-- 补充材料 sys_employee_material
+DROP TABLE IF EXISTS sys_employee_material;
+CREATE TABLE sys_employee_material (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
     material_name VARCHAR(50) NOT NULL,
     file_path VARCHAR(1000) NOT NULL,
     upload_time TIMESTAMP(3) NOT NULL,
@@ -439,21 +442,18 @@ CREATE TABLE sys_user_profile_material (
     updater VARCHAR(20),
     update_time TIMESTAMP(3)
 );
-COMMENT ON TABLE sys_user_profile_material IS '补充材料表';
-COMMENT ON COLUMN sys_user_profile_material.id IS '主键';
-COMMENT ON COLUMN sys_user_profile_material.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_profile_material.material_name IS '材料名称';
-COMMENT ON COLUMN sys_user_profile_material.file_path IS '文件存储路径，包含文件名';
-COMMENT ON COLUMN sys_user_profile_material.upload_time IS '文件上传时间';
-COMMENT ON COLUMN sys_user_profile_material.description IS '补充说明';
-COMMENT ON COLUMN sys_user_profile_material.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_profile_material.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_profile_material.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_profile_material.update_time IS '更新时间';
-CREATE INDEX idx_user_material_user_id ON sys_user_profile_material (user_id);
-
--- 清理旧版多公司表
-DROP TABLE IF EXISTS sys_company;
+COMMENT ON TABLE sys_employee_material IS '补充材料';
+COMMENT ON COLUMN sys_employee_material.id IS '主键';
+COMMENT ON COLUMN sys_employee_material.employee_id IS '用户id';
+COMMENT ON COLUMN sys_employee_material.material_name IS '材料名称';
+COMMENT ON COLUMN sys_employee_material.file_path IS '文件存储路径，包含文件名';
+COMMENT ON COLUMN sys_employee_material.upload_time IS '文件上传时间';
+COMMENT ON COLUMN sys_employee_material.description IS '补充说明';
+COMMENT ON COLUMN sys_employee_material.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee_material.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee_material.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee_material.update_time IS '更新时间';
+CREATE INDEX idx_employee_material_employee_id ON sys_employee_material (employee_id);
 
 -- 部门表
 DROP TABLE IF EXISTS sys_department;
@@ -490,11 +490,11 @@ COMMENT ON COLUMN sys_department.updater IS '更新用户';
 COMMENT ON COLUMN sys_department.update_time IS '更新时间';
 CREATE INDEX idx_department_parent_id ON sys_department (parent_id);
 
--- 用户-部门关系表
-DROP TABLE IF EXISTS sys_user_department_ref;
-CREATE TABLE sys_user_department_ref (
+-- 用户 - 部门关系表
+DROP TABLE IF EXISTS sys_employee_department_ref;
+CREATE TABLE sys_employee_department_ref (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
     department_id INTEGER NOT NULL,
     position_id INTEGER,
     primary_assignment BOOLEAN NOT NULL DEFAULT FALSE,
@@ -506,21 +506,21 @@ CREATE TABLE sys_user_department_ref (
     updater VARCHAR(20),
     update_time TIMESTAMP(3)
 );
-COMMENT ON TABLE sys_user_department_ref IS '用户-部门关系表';
-COMMENT ON COLUMN sys_user_department_ref.id IS '主键';
-COMMENT ON COLUMN sys_user_department_ref.user_id IS '用户id';
-COMMENT ON COLUMN sys_user_department_ref.department_id IS '部门id';
-COMMENT ON COLUMN sys_user_department_ref.position_id IS '职位id';
-COMMENT ON COLUMN sys_user_department_ref.primary_assignment IS '是否主职.0=否;1=是';
-COMMENT ON COLUMN sys_user_department_ref.start_date IS '开始日期';
-COMMENT ON COLUMN sys_user_department_ref.end_date IS '结束日期';
-COMMENT ON COLUMN sys_user_department_ref.enabled IS '是否启用.0=否;1=是';
-COMMENT ON COLUMN sys_user_department_ref.creator IS '创建用户';
-COMMENT ON COLUMN sys_user_department_ref.create_time IS '创建时间';
-COMMENT ON COLUMN sys_user_department_ref.updater IS '更新用户';
-COMMENT ON COLUMN sys_user_department_ref.update_time IS '更新时间';
-CREATE INDEX idx_user_department_user_id ON sys_user_department_ref (user_id);
-CREATE INDEX idx_user_department_department_id ON sys_user_department_ref (department_id);
+COMMENT ON TABLE sys_employee_department_ref IS '用户 - 部门关系表';
+COMMENT ON COLUMN sys_employee_department_ref.id IS '主键';
+COMMENT ON COLUMN sys_employee_department_ref.employee_id IS '用户id';
+COMMENT ON COLUMN sys_employee_department_ref.department_id IS '部门id';
+COMMENT ON COLUMN sys_employee_department_ref.position_id IS '职位id';
+COMMENT ON COLUMN sys_employee_department_ref.primary_assignment IS '是否主职.0=否;1=是';
+COMMENT ON COLUMN sys_employee_department_ref.start_date IS '开始日期';
+COMMENT ON COLUMN sys_employee_department_ref.end_date IS '结束日期';
+COMMENT ON COLUMN sys_employee_department_ref.enabled IS '是否启用.0=否;1=是';
+COMMENT ON COLUMN sys_employee_department_ref.creator IS '创建用户';
+COMMENT ON COLUMN sys_employee_department_ref.create_time IS '创建时间';
+COMMENT ON COLUMN sys_employee_department_ref.updater IS '更新用户';
+COMMENT ON COLUMN sys_employee_department_ref.update_time IS '更新时间';
+CREATE INDEX idx_employee_department_employee_id ON sys_employee_department_ref (employee_id);
+CREATE INDEX idx_employee_department_department_id ON sys_employee_department_ref (department_id);
 
 
 -- ------------------------------------------------
@@ -601,7 +601,7 @@ CREATE TABLE data_ancient_book (
     image_url VARCHAR(100),
     origin_image_url VARCHAR(100),
     publication_time VARCHAR(100),
-    summary TEXT,
+    summer TEXT,
     score DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     comments INTEGER NOT NULL DEFAULT 0,
     book_status_id INTEGER NOT NULL DEFAULT 0,
@@ -622,7 +622,7 @@ COMMENT ON COLUMN data_ancient_book.editor IS '编辑人/出版人';
 COMMENT ON COLUMN data_ancient_book.image_url IS '图片';
 COMMENT ON COLUMN data_ancient_book.origin_image_url IS '原始图片';
 COMMENT ON COLUMN data_ancient_book.publication_time IS '初版时间';
-COMMENT ON COLUMN data_ancient_book.summary IS '简介';
+COMMENT ON COLUMN data_ancient_book.summer IS '简介';
 COMMENT ON COLUMN data_ancient_book.score IS '评分';
 COMMENT ON COLUMN data_ancient_book.comments IS '评论人次';
 COMMENT ON COLUMN data_ancient_book.book_status_id IS '书籍状态（0:正常,1:下架,2:推荐,3:热卖）';

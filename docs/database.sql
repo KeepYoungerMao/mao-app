@@ -113,7 +113,7 @@ CREATE TABLE `sys_user`
     `locked` TINYINT DEFAULT 0 COMMENT '是否锁定',
     `expire_time` DATETIME(3) COMMENT '过期时间',
     `last_login_time` DATETIME(3) COMMENT '上次登陆时间',
-    `password_status` INT COMMENT '密码状态.0=正常;1=首次需要更改密码;2=密码已更改;3=密码已重置',
+    `password_status` INT NOT NULL DEFAULT 0 COMMENT '密码状态.0=正常;1=首次需要更改密码;2=密码已更改;3=密码已重置',
     `creator` VARCHAR(20) COMMENT '创建用户',
     `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
@@ -172,13 +172,13 @@ CREATE TABLE `sys_role_permission_ref`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 用户资料信息
--- 基本信息 sys_user_profile
-DROP TABLE IF EXISTS `sys_user_profile`;
-CREATE TABLE `sys_user_profile`
+-- 基本信息 sys_employee
+DROP TABLE IF EXISTS `sys_employee`;
+CREATE TABLE `sys_employee`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
-    `user_code` VARCHAR(10) NOT NULL COMMENT '用户编号',
+    `user_id` INT COMMENT '用户id',
+    `employee_code` VARCHAR(10) NOT NULL COMMENT '用户编号',
     `real_name` VARCHAR(20) NOT NULL COMMENT '姓名',
     `sex_id` INT COMMENT '性别ID',
     `entry_date` DATE COMMENT '入职日期',
@@ -210,15 +210,15 @@ CREATE TABLE `sys_user_profile`
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
-    KEY user_code(`user_code`),
+    KEY employee_code(`employee_code`),
     UNIQUE KEY (`id_card_num`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
--- 教育经历 sys_user_profile_education
-DROP TABLE IF EXISTS `sys_user_profile_education`;
-CREATE TABLE `sys_user_profile_education`
+) ENGINE = InnoDB AUTO_INCREMENT=10000001 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+-- 教育经历 sys_employee_education
+DROP TABLE IF EXISTS `sys_employee_education`;
+CREATE TABLE `sys_employee_education`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
+    `employee_id` INT NOT NULL COMMENT '用户id',
     `institution_name` VARCHAR(50) NOT NULL COMMENT '学校/教育机构名称',
     `degree` VARCHAR(30) COMMENT '获得的学位',
     `major` VARCHAR(50) COMMENT '专业名称',
@@ -230,15 +230,15 @@ CREATE TABLE `sys_user_profile_education`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY user_id(`user_id`),
-    UNIQUE KEY(`user_id`, `institution_name`)
+    KEY employee_id(`employee_id`),
+    UNIQUE KEY(`employee_id`, `institution_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
--- 工作经历 sys_user_profile_work
-DROP TABLE IF EXISTS `sys_user_profile_work`;
-CREATE TABLE `sys_user_profile_work`
+-- 工作经历 sys_employee_work
+DROP TABLE IF EXISTS `sys_employee_work`;
+CREATE TABLE `sys_employee_work`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
+    `employee_id` INT NOT NULL COMMENT '用户id',
     `company_name` VARCHAR(50) NOT NULL COMMENT '公司/单位名称',
     `job_title` VARCHAR(30) COMMENT '职位名称',
     `industry` VARCHAR(50) COMMENT '所在行业',
@@ -252,15 +252,15 @@ CREATE TABLE `sys_user_profile_work`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY user_id(`user_id`),
-    UNIQUE KEY(`user_id`, `company_name`)
+    KEY employee_id(`employee_id`),
+    UNIQUE KEY(`employee_id`, `company_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
--- 人员关系 sys_user_profile_relationship
-DROP TABLE IF EXISTS `sys_user_profile_relationship`;
-CREATE TABLE `sys_user_profile_relationship`
+-- 人员关系 sys_employee_relationship
+DROP TABLE IF EXISTS `sys_employee_relationship`;
+CREATE TABLE `sys_employee_relationship`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
+    `employee_id` INT NOT NULL COMMENT '用户id',
     `real_name` VARCHAR(20) NOT NULL COMMENT '姓名',
     `relationship_id` INT NOT NULL COMMENT '人员关系ID',
     `id_card_num` VARCHAR(18) COMMENT '身份证号',
@@ -271,14 +271,14 @@ CREATE TABLE `sys_user_profile_relationship`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY user_id(`user_id`)
+    KEY employee_id(`employee_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
--- 补充材料 sys_user_profile_material
-DROP TABLE IF EXISTS `sys_user_profile_material`;
-CREATE TABLE `sys_user_profile_material`
+-- 补充材料 sys_employee_material
+DROP TABLE IF EXISTS `sys_employee_material`;
+CREATE TABLE `sys_employee_material`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
+    `employee_id` INT NOT NULL COMMENT '用户id',
     `material_name` VARCHAR(50) NOT NULL COMMENT '材料名称',
     `file_path` VARCHAR(1000) NOT NULL COMMENT '文件存储路径，包含文件名',
     `upload_time` DATETIME(3) NOT NULL COMMENT '文件上传时间',
@@ -288,12 +288,9 @@ CREATE TABLE `sys_user_profile_material`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY user_id(`user_id`),
-    UNIQUE KEY(`user_id`, `material_name`)
+    KEY employee_id(`employee_id`),
+    UNIQUE KEY(`employee_id`, `material_name`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-
--- 清理旧版多公司表
-DROP TABLE IF EXISTS `sys_company`;
 
 -- 部门表
 DROP TABLE IF EXISTS `sys_department`;
@@ -318,11 +315,11 @@ CREATE TABLE `sys_department`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- 用户 - 部门关系表
-DROP TABLE IF EXISTS `sys_user_department_ref`;
-CREATE TABLE `sys_user_department_ref`
+DROP TABLE IF EXISTS `sys_employee_department_ref`;
+CREATE TABLE `sys_employee_department_ref`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    `user_id` INT NOT NULL COMMENT '用户id',
+    `employee_id` INT NOT NULL COMMENT '用户id',
     `department_id` INT NOT NULL COMMENT '部门id',
     `position_id` INT COMMENT '职位id',
     `primary_assignment` TINYINT NOT NULL DEFAULT 0 COMMENT '是否主职.0=否;1=是',
@@ -334,13 +331,13 @@ CREATE TABLE `sys_user_department_ref`
     `updater` VARCHAR(20) COMMENT '更新用户',
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    KEY (`user_id`),
+    KEY (`employee_id`),
     KEY (`department_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- ------------------------------------------------
--- 系统 sys 部分
+-- 数据 data 部分
 -- ------------------------------------------------
 
 

@@ -1,6 +1,5 @@
 package com.mao.user.entity
 
-import com.mao.department.entity.DepartmentVo
 import com.mao.role.entity.RoleVo
 
 /**
@@ -8,7 +7,5 @@ import com.mao.role.entity.RoleVo
  */
 data class UserDetailVo(
     val user: UserVo,
-    val profile: UserProfileVo,
-    val roles: List<RoleVo>,
-    val departments: List<DepartmentVo>
+    val roles: List<RoleVo>
 )

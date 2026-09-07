@@ -14,14 +14,8 @@ enum class OperationScope { SYSTEM, DATA }
  * 操作模块
  */
 enum class OperationModule(val scope: OperationScope) {
-    USER(OperationScope.SYSTEM), 
-    USER_PROFILE(OperationScope.SYSTEM),
-    USER_PROFILE_EDUCATION(OperationScope.SYSTEM),
-    USER_PROFILE_WORK(OperationScope.SYSTEM),
-    USER_PROFILE_RELATIONSHIP(OperationScope.SYSTEM),
-    USER_PROFILE_MATERIAL(OperationScope.SYSTEM),
+    USER(OperationScope.SYSTEM),
     USER_ROLE(OperationScope.SYSTEM),
-    USER_DEPARTMENT(OperationScope.SYSTEM),
     ROLE(OperationScope.SYSTEM),
     ROLE_PERMISSION(OperationScope.SYSTEM),
     PERMISSION(OperationScope.SYSTEM), 
@@ -29,6 +23,12 @@ enum class OperationModule(val scope: OperationScope) {
     DICT(OperationScope.SYSTEM),
     REGION(OperationScope.SYSTEM),
     INDUSTRY(OperationScope.SYSTEM),
+    EMPLOYEE(OperationScope.SYSTEM),
+    EMPLOYEE_EDUCATION(OperationScope.SYSTEM),
+    EMPLOYEE_WORK(OperationScope.SYSTEM),
+    EMPLOYEE_RELATIONSHIP(OperationScope.SYSTEM),
+    EMPLOYEE_MATERIAL(OperationScope.SYSTEM),
+    EMPLOYEE_DEPARTMENT(OperationScope.SYSTEM),
     DEPARTMENT(OperationScope.SYSTEM), 
     
     ANCIENT_BOOK(OperationScope.DATA), 

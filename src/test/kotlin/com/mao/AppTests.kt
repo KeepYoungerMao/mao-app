@@ -1,8 +1,5 @@
 package com.mao
 
-import com.mao.user.entity.UserAddQo
-import com.mao.user.mapper.UserCreateMapper
-import com.mao.user.mapper.UserProfileCreateMapper
 import com.mao.common.util.RsaUtils
 import com.mao.common.validate.IdCard
 import jakarta.validation.Validation
@@ -11,7 +8,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.security.interfaces.RSAPublicKey
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -36,25 +32,6 @@ class AppTests {
         println(timestamp)
         val encode = RsaUtils.encrypt("test:${timestamp}", publicKey)
         println(encode)
-    }
-
-    @Test
-    fun testMappie() {
-        val userAdd = UserAddQo(
-            username = "test_username",
-            avatar = "test_avatar",
-            phone = "test_phone",
-            email = "test_email",
-            expireTime = LocalDateTime.now().plusDays(1),
-            realName = "test_name",
-            entryDate = LocalDate.now(),
-            idCardNum = "124124618947191391",
-            birthday = LocalDate.of(1970, 1, 1),
-        )
-        val user = UserCreateMapper.map(userAdd)
-        println(user)
-        val userProfile = UserProfileCreateMapper.map(userAdd)
-        println(userProfile)
     }
 
     data class IdCardTest(@field:IdCard val idCardNum: String?)

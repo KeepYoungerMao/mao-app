@@ -13,9 +13,6 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
 
     suspend fun findByUsername(username: String): UserDo?
 
-    @Query("select * from sys_user where id = :id for update")
-    suspend fun findByIdForUpdate(@Param("id") id: Int): UserDo?
-
     @Query("""
         SELECT u.*
         FROM sys_user u
@@ -34,15 +31,6 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
                     AND ur.role_id = :roleId
               )
           )
-          AND (
-              :departmentId IS NULL
-              OR EXISTS (
-                  SELECT 1
-                  FROM sys_user_department_ref ud
-                  WHERE ud.user_id = u.id
-                    AND ud.department_id = :departmentId
-              )
-          )
         ORDER BY u.id DESC
         LIMIT :pageSize OFFSET :offset
     """)
@@ -54,7 +42,6 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
         @Param("locked") locked: Boolean?,
         @Param("enabled") enabled: Boolean?,
         @Param("roleId") roleId: Int?,
-        @Param("departmentId") departmentId: Int?,
         @Param("pageSize") pageSize: Int,
         @Param("offset") offset: Int,
     ): Flow<UserDo>
@@ -77,15 +64,6 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
                     AND ur.role_id = :roleId
               )
           )
-          AND (
-              :departmentId IS NULL
-              OR EXISTS (
-                  SELECT 1
-                  FROM sys_user_department_ref ud
-                  WHERE ud.user_id = u.id
-                    AND ud.department_id = :departmentId
-              )
-          )
     """)
     suspend fun countUsers(
         @Param("username") username: String?,
@@ -94,8 +72,7 @@ interface UserRepository: BaseRepository<UserDo, Int, UserQo> {
         @Param("expired") expired: Boolean?,
         @Param("locked") locked: Boolean?,
         @Param("enabled") enabled: Boolean?,
-        @Param("roleId") roleId: Int?,
-        @Param("departmentId") departmentId: Int?,
+        @Param("roleId") roleId: Int?
     ): Long
 
 }
