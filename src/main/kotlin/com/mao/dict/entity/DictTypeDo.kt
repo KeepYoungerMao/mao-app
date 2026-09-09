@@ -1,5 +1,6 @@
 package com.mao.dict.entity
 
+import com.mao.common.entity.BaseDo
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
@@ -9,4 +10,4 @@ data class DictTypeDo(
     var id: Int? = null,
     var name: String? = null,
     var description: String? = null
-)
+) : BaseDo()

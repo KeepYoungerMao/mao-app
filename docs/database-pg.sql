@@ -24,12 +24,20 @@ DROP TABLE IF EXISTS sys_dict;
 CREATE TABLE sys_dict (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    description VARCHAR(256)
+    description VARCHAR(256),
+    creator VARCHAR(20),
+    create_time TIMESTAMP(3),
+    updater VARCHAR(20),
+    update_time TIMESTAMP(3),
 );
 COMMENT ON TABLE sys_dict IS '字典表';
 COMMENT ON COLUMN sys_dict.id IS '主键';
 COMMENT ON COLUMN sys_dict.name IS '名称';
 COMMENT ON COLUMN sys_dict.description IS '描述';
+COMMENT ON COLUMN sys_dict.creator IS '创建用户';
+COMMENT ON COLUMN sys_dict.create_time IS '创建时间';
+COMMENT ON COLUMN sys_dict.updater IS '更新用户';
+COMMENT ON COLUMN sys_dict.update_time IS '更新时间';
 
 -- 字典项表
 DROP TABLE IF EXISTS sys_dict_item;

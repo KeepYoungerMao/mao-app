@@ -15,6 +15,10 @@ CREATE TABLE `sys_dict`
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name` VARCHAR(50) NOT NULL COMMENT '名称',
     `description` VARCHAR(256) COMMENT '描述',
+    `creator` VARCHAR(20) COMMENT '创建用户',
+    `create_time` DATETIME(3) COMMENT '创建时间',
+    `updater` VARCHAR(20) COMMENT '更新用户',
+    `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
