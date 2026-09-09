@@ -14,6 +14,8 @@ interface EmployeeDepartmentRefRepository : CoroutineCrudRepository<EmployeeDepa
 
     suspend fun countByEmployeeIdAndEnabled(employeeId: Int, enabled: Boolean): Long
 
+    suspend fun countByDepartmentId(departmentId: Int): Long
+
     @Modifying
     @Query("update sys_employee_department_ref set primary_assignment = false where employee_id = :employeeId")
     suspend fun clearPrimaryAssignment(@Param("employeeId") employeeId: Int): Int

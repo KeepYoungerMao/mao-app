@@ -262,7 +262,7 @@ DROP TABLE IF EXISTS sys_employee;
 CREATE TABLE sys_employee (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
-    employee_code VARCHAR(10) NOT NULL,
+    employee_code VARCHAR(32) NOT NULL,
     real_name VARCHAR(20) NOT NULL,
     sex_id INTEGER,
     entry_date DATE,
@@ -328,8 +328,21 @@ COMMENT ON COLUMN sys_employee.updater IS '更新用户';
 COMMENT ON COLUMN sys_employee.update_time IS '更新时间';
 SELECT setval('sys_employee_id_seq', 10000000, false);
 CREATE INDEX idx_employee_user_id ON sys_employee (user_id);
-CREATE INDEX idx_employee_code ON sys_employee (employee_code);
+CREATE UNIQUE INDEX uk_employee_code ON sys_employee (employee_code);
 CREATE INDEX idx_employee_id_card_num_trgm ON sys_employee USING GIN (id_card_num gin_trgm_ops);
+
+-- 员工编码序列
+DROP TABLE IF EXISTS sys_employee_code_sequence;
+CREATE TABLE sys_employee_code_sequence (
+    id SERIAL PRIMARY KEY,
+    sequence_year INTEGER NOT NULL,
+    department_code VARCHAR(6) NOT NULL,
+    current_value INTEGER NOT NULL DEFAULT 1,
+    create_time TIMESTAMP(3),
+    update_time TIMESTAMP(3),
+    CONSTRAINT uk_employee_code_sequence_year_department UNIQUE (sequence_year, department_code)
+);
+CREATE INDEX idx_employee_code_sequence_department ON sys_employee_code_sequence (department_code);
 
 -- 教育经历 sys_employee_education
 DROP TABLE IF EXISTS sys_employee_education;
@@ -480,7 +493,7 @@ COMMENT ON COLUMN sys_department.parent_id IS '父部门id';
 COMMENT ON COLUMN sys_department.department_code IS '部门编号';
 COMMENT ON COLUMN sys_department.department_name IS '部门名称';
 COMMENT ON COLUMN sys_department.description IS '部门描述';
-COMMENT ON COLUMN sys_department.department_type IS '部门类型';
+COMMENT ON COLUMN sys_department.department_type IS '部门类型.1=一级;2=二级;3=三级;4=四级;5=五级';
 COMMENT ON COLUMN sys_department.member_assignable IS '是否可分配成员';
 COMMENT ON COLUMN sys_department.sort_order IS '排序号';
 COMMENT ON COLUMN sys_department.status IS '状态.0=禁用;1=启用;2=归档';

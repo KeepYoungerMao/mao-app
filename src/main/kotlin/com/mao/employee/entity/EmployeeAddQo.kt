@@ -5,9 +5,12 @@ import com.mao.common.validate.IdCard
 import com.mao.common.validate.RegionField
 import com.mao.dict.entity.RegionType
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 data class EmployeeAddQo(
+    @field:NotNull
+    val departmentId: Int? = null,
     @field:NotBlank
     val realName: String? = null,
     @field:DictField("SEX")

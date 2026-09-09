@@ -25,7 +25,7 @@ CREATE TABLE `sys_dict_item`
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `pid` INT NOT NULL COMMENT '父主键',
     `name` VARCHAR(100) NOT NULL COMMENT '名称',
-    `status` INT NOT NULL DEFAULT 1 COMMENT '状态，1：启用，0：禁用',
+    `status` INT NOT NULL DEFAULT 1 COMMENT '状态，1：启用，0：禁用，2：归档',
     `creator` VARCHAR(20) COMMENT '创建用户',
     `create_time` DATETIME(3) COMMENT '创建时间',
     `updater` VARCHAR(20) COMMENT '更新用户',
@@ -178,7 +178,7 @@ CREATE TABLE `sys_employee`
 (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
     `user_id` INT COMMENT '用户id',
-    `employee_code` VARCHAR(10) NOT NULL COMMENT '用户编号',
+    `employee_code` VARCHAR(32) NOT NULL COMMENT '用户编号',
     `real_name` VARCHAR(20) NOT NULL COMMENT '姓名',
     `sex_id` INT COMMENT '性别ID',
     `entry_date` DATE COMMENT '入职日期',
@@ -210,9 +210,23 @@ CREATE TABLE `sys_employee`
     `update_time` DATETIME(3) COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY user_id(`user_id`),
-    KEY employee_code(`employee_code`),
+    UNIQUE KEY employee_code(`employee_code`),
     UNIQUE KEY (`id_card_num`)
 ) ENGINE = InnoDB AUTO_INCREMENT=10000001 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+
+-- 员工编码序列
+DROP TABLE IF EXISTS `sys_employee_code_sequence`;
+CREATE TABLE `sys_employee_code_sequence`
+(
+    `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `sequence_year` INT NOT NULL COMMENT '年份',
+    `department_code` VARCHAR(6) NOT NULL COMMENT '三层部门代码',
+    `current_value` INT NOT NULL DEFAULT 1 COMMENT '当前序列值',
+    `create_time` DATETIME(3) COMMENT '创建时间',
+    `update_time` DATETIME(3) COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY (`sequence_year`, `department_code`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 -- 教育经历 sys_employee_education
 DROP TABLE IF EXISTS `sys_employee_education`;
 CREATE TABLE `sys_employee_education`
@@ -301,7 +315,7 @@ CREATE TABLE `sys_department`
     `department_code` VARCHAR(20) NOT NULL COMMENT '部门编号',
     `department_name` VARCHAR(100) NOT NULL COMMENT '部门名称',
     `description` VARCHAR(300) COMMENT '部门描述',
-    `department_type` INT COMMENT '部门类型.1=公司;2=事业部;3=部门;4=小组;5=虚拟组织',
+    `department_type` INT COMMENT '部门类型.1=一级;2=二级;3=三级;4=四级;5=五级',
     `member_assignable` TINYINT NOT NULL DEFAULT 1 COMMENT '是否可分配成员.1=是;0=否',
     `sort_order` INT NOT NULL DEFAULT 0 COMMENT '排序号',
     `status` INT NOT NULL DEFAULT 1 COMMENT '状态.0=禁用;1=启用;2=归档',

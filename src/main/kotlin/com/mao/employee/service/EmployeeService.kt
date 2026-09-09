@@ -38,14 +38,16 @@ class EmployeeService(
         }
     }
 
+    @Transactional
     suspend fun createEmployee(request: EmployeeAddQo): EmployeeVo {
         val employee = EmployeeCreateMapper.map(request).apply {
-            this.employeeCode = employeeCodeHandler.generateDeployeeCode()
+            this.employeeCode = employeeCodeHandler.generateEmployeeCode(request.departmentId!!)
         }
         val savedEmployee = employeeRepository.save(employee)
         return EmployeeViewMapper.map(savedEmployee)
     }
 
+    @Transactional
     suspend fun updateEmployee(employeeUpdate: EmployeeUpdateQo): EmployeeVo {
         val employee = employeeRepository.findByIdOrThrow(employeeUpdate.id)
         val employeeUpdateDo = EmployeeMapper.copyToExistDo(employeeUpdate, employee)

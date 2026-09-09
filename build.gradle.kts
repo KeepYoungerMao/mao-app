@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.mao"
-version = "1.0.1"
+version = "1.0.2"
 description = "mao-app"
 
 java {

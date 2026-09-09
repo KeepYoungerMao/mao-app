@@ -1,5 +1,6 @@
 package com.mao.dict.service
 
+import com.mao.common.entity.DataStatus
 import com.mao.common.entity.ErrorCode
 import com.mao.common.entity.Tips
 import com.mao.common.ex.AppException
@@ -41,7 +42,7 @@ class DictService(
             throw AppException(ErrorCode.BAD_REQUEST, "同一字典下名称已存在")
         }
         // 数据保存
-        val dictItem = dictItemRepository.save(DictItemDo(pid = pid, name = name, status = 1))
+        val dictItem = dictItemRepository.save(DictItemDo(pid = pid, name = name, status = DataStatus.ENABLED.status))
         // 更新缓存
         dictCache.addOrUpdateDictItem(dictItem)
         // 返回结果
@@ -71,7 +72,7 @@ class DictService(
         val itemId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
         val item = dictItemRepository.findById(itemId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
         // 数据保存
-        item.status = 0
+        item.status = DataStatus.DISABLED.status
         dictItemRepository.save(item)
         // 更新缓存
         dictCache.addOrUpdateDictItem(item)

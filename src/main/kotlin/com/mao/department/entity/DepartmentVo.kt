@@ -1,9 +1,10 @@
 package com.mao.department.entity
 
 import com.mao.common.entity.BaseVo
+import com.mao.common.entity.Tree
 
 data class DepartmentVo(
-    val id: Int? = null,
+    override val id: Int? = null,
     val parentId: Int? = null,
     val departmentCode: String? = null,
     val departmentName: String? = null,
@@ -11,5 +12,12 @@ data class DepartmentVo(
     val departmentType: Int? = null,
     val memberAssignable: Boolean? = null,
     val sortOrder: Int? = null,
-    val status: Int? = null
-) : BaseVo()
+    val status: Int? = null,
+    override val children: List<DepartmentVo> = emptyList()
+) : BaseVo(), Tree<DepartmentVo> {
+
+    override val pid: Int?
+        get() = parentId
+
+    override fun withChildren(children: List<DepartmentVo>): DepartmentVo = copy(children = children)
+}
