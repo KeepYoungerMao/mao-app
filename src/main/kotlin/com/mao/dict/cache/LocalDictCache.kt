@@ -3,6 +3,7 @@ package com.mao.dict.cache
 import com.mao.common.util.TreeUtils
 import com.mao.dict.entity.*
 import com.mao.dict.mapper.DictItemViewMapper
+import com.mao.dict.mapper.DictTypeViewMapper
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
 import com.mao.dict.repository.IndustryRepository
@@ -90,6 +91,19 @@ class LocalDictCache(
         return getDictSnapshot().dictMap
     }
 
+    override suspend fun getDictTypes(): List<DictTypeVo> {
+        return getDictSnapshot().types.values.toList()
+    }
+
+    override suspend fun getDictItems(pid: Int): List<DictItemVo> {
+        val snapshot = getDictSnapshot()
+        return if (pid in snapshot.types) {
+            snapshot.items.values.filter { it.pid == pid }
+        } else {
+            emptyList()
+        }
+    }
+
     /**
      * 在指定字典大项的范围内，使用预先生成的启用细项 ID 集合进行 O(1) 校验。
      *
@@ -109,15 +123,15 @@ class LocalDictCache(
      * 因此字典大项改名后，旧名称会立即消失，新名称会自动关联原有细项。
      */
     override suspend fun addOrUpdateDict(dictType: DictTypeDo) {
-        val type = CachedDictType(
-            id = requireNotNull(dictType.id) { "字典大项 ID 不能为空" },
-            name = requireNotNull(dictType.name) { "字典大项名称不能为空" }
-        )
+        val type = DictTypeViewMapper.map(dictType).also {
+            requireNotNull(it.id) { "字典大项 ID 不能为空" }
+            requireNotNull(it.name) { "字典大项名称不能为空" }
+        }
         dictMutex.withLock {
             // 若启动预加载尚未完成，则先在同一把锁内完成初始化，再执行本次更新。
             val current = dictSnapshot ?: loadDictSnapshot()
             // Map 的 + 操作创建新 Map，不直接修改正在被查询线程使用的旧快照。
-            dictSnapshot = buildDictSnapshot(current.types + (type.id to type), current.items)
+            dictSnapshot = buildDictSnapshot(current.types + (type.id!! to type), current.items)
         }
     }
 
@@ -204,7 +218,7 @@ class LocalDictCache(
             if (id == null || name == null) {
                 null
             } else {
-                id to CachedDictType(id, name)
+                id to DictTypeViewMapper.map(dictType)
             }
         }.toMap()
 
@@ -222,11 +236,11 @@ class LocalDictCache(
     }
 
     private fun buildDictSnapshot(
-        types: Map<Int, CachedDictType>,
+        types: Map<Int, DictTypeVo>,
         items: Map<Int, DictItemVo>
     ): DictSnapshot {
         // 大项名称是 getDictMap 的 key，重复名称会导致数据被静默覆盖，因此主动拒绝脏数据。
-        require(types.values.map(CachedDictType::name).distinct().size == types.size) {
+        require(types.values.map { requireNotNull(it.name) }.distinct().size == types.size) {
             "字典大项名称不能重复"
         }
         // 先按所属大项筛选全部有效细项，包含 status == 0 的禁用数据。
@@ -237,7 +251,7 @@ class LocalDictCache(
 
         // getDictMap 返回大项下的全部有效细项，启用状态不在这里过滤。
         val dictMap = types.values.associate { type ->
-            type.name to itemsByType[type.id].orEmpty()
+            requireNotNull(type.name) to itemsByType[type.id].orEmpty()
         }
 
         // 单独构建启用 ID 索引，仅供 isActiveDictItem 使用。
@@ -249,7 +263,7 @@ class LocalDictCache(
             items = items,
             dictMap = dictMap,
             activeItemIdsByType = types.values.associate { type ->
-                type.name to activeItemsByType[type.id].orEmpty().mapNotNull(DictItemVo::id).toSet()
+                requireNotNull(type.name) to activeItemsByType[type.id].orEmpty().mapNotNull(DictItemVo::id).toSet()
             }
         )
     }
@@ -328,18 +342,13 @@ class LocalDictCache(
     }
 
     /**
-     * 普通字典大项在缓存计算中只需要 ID 和作为映射 key 的名称。
-     */
-    private data class CachedDictType(val id: Int, val name: String)
-
-    /**
      * 普通字典完整快照：
      * - types/items 是增量更新下一份快照所需的源数据；
      * - dictMap 是按大项名称组织的细项列表；
      * - activeItemIdsByType 是按大项名称组织的启用细项 ID 集合，用于带范围的快速校验。
      */
     private data class DictSnapshot(
-        val types: Map<Int, CachedDictType>,
+        val types: Map<Int, DictTypeVo>,
         val items: Map<Int, DictItemVo>,
         val dictMap: Map<String, List<DictItemVo>>,
         val activeItemIdsByType: Map<String, Set<Int>>

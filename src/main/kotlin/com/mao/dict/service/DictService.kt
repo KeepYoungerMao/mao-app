@@ -5,11 +5,9 @@ import com.mao.common.entity.ErrorCode
 import com.mao.common.entity.Tips
 import com.mao.common.ex.AppException
 import com.mao.dict.cache.DictCache
-import com.mao.dict.entity.DictItemAddQo
-import com.mao.dict.entity.DictItemDo
-import com.mao.dict.entity.DictItemUpdateQo
-import com.mao.dict.entity.DictItemVo
+import com.mao.dict.entity.*
 import com.mao.dict.mapper.DictItemViewMapper
+import com.mao.dict.mapper.DictTypeViewMapper
 import com.mao.dict.repository.DictItemRepository
 import com.mao.dict.repository.DictTypeRepository
 import org.springframework.stereotype.Service
@@ -28,10 +26,45 @@ class DictService(
     private val dictCache: DictCache
 ) {
 
-    suspend fun searchAllDict(): Map<String, List<DictItemVo>> = dictCache.getDictMap()
+    suspend fun searchDictTree(): Map<String, List<DictItemVo>> = dictCache.getDictMap()
+
+    suspend fun searchAllDictType(): List<DictTypeVo> = dictCache.getDictTypes()
 
     @Transactional
-    suspend fun createItem(request: DictItemAddQo): DictItemVo {
+    suspend fun createDictType(request: DictTypeAddQo): DictTypeVo {
+        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
+        if (dictTypeRepository.findByName(name) != null) {
+            throw AppException(ErrorCode.BAD_REQUEST, "字典名称已存在")
+        }
+        val dictType = dictTypeRepository.save(
+            DictTypeDo(name = name, description = request.description)
+        )
+        dictCache.addOrUpdateDict(dictType)
+        return DictTypeViewMapper.map(dictType)
+    }
+
+    @Transactional
+    suspend fun updateDictType(request: DictTypeUpdateQo): DictTypeVo {
+        val id = request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val current = dictTypeRepository.findById(id) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
+        val name = request.name ?: throw AppException(ErrorCode.BAD_REQUEST)
+        val duplicate = dictTypeRepository.findByName(name)
+        if (duplicate != null && duplicate.id != id) {
+            throw AppException(ErrorCode.BAD_REQUEST, "字典名称已存在")
+        }
+        current.name = name
+        current.description = request.description
+        val dictType = dictTypeRepository.save(current)
+        dictCache.addOrUpdateDict(dictType)
+        return DictTypeViewMapper.map(dictType)
+    }
+
+    suspend fun searchAllDictItem(pid: Int?): List<DictItemVo> {
+        return dictCache.getDictItems(pid ?: throw AppException(ErrorCode.BAD_REQUEST))
+    }
+
+    @Transactional
+    suspend fun createDictItem(request: DictItemAddQo): DictItemVo {
         val pid = request.pid ?: throw AppException(ErrorCode.BAD_REQUEST)
         if (dictTypeRepository.findById(pid) == null) {
             throw AppException(ErrorCode.BAD_REQUEST, "父字典不存在")
@@ -50,7 +83,7 @@ class DictService(
     }
 
     @Transactional
-    suspend fun updateItem(request: DictItemUpdateQo): DictItemVo {
+    suspend fun updateDictItem(request: DictItemUpdateQo): DictItemVo {
         // 参数校验
         val id = request.id ?: throw AppException(ErrorCode.BAD_REQUEST)
         val item = dictItemRepository.findById(id) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
@@ -68,7 +101,7 @@ class DictService(
     }
 
     @Transactional
-    suspend fun disableItem(id: Int?): Tips {
+    suspend fun disableDictItem(id: Int?): Tips {
         val itemId = id ?: throw AppException(ErrorCode.BAD_REQUEST)
         val item = dictItemRepository.findById(itemId) ?: throw AppException(ErrorCode.DATA_NOT_FOUND)
         // 数据保存

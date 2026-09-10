@@ -11,6 +11,7 @@
 ### Added
 
 - 字典表`sys_dict`新增审计字段；
+- 新增系统字典相关API；
 
 ### Changed
 

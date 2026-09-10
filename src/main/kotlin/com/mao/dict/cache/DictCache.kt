@@ -22,6 +22,17 @@ interface DictCache {
     suspend fun getDictMap() : Map<String, List<DictItemVo>>
 
     /**
+     * ## 获取所有字典大项
+     */
+    suspend fun getDictTypes(): List<DictTypeVo>
+
+    /**
+     * ## 获取指定字典大项下的全部细项
+     * 包含启用和禁用项
+     */
+    suspend fun getDictItems(pid: Int): List<DictItemVo>
+
+    /**
      * ## 判断指定大项下的细项ID是否正确且启用
      * 用于对引用字典ID的数据进行检测。
      * 只有字典大项名称存在、细项属于该大项并且细项处于启用状态时才返回 true。
